@@ -21,3 +21,8 @@ _testmain.go
 
 *.exe
 *.test
+
+#vim files
+
+*.swp
+*~
