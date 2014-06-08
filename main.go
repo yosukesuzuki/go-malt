@@ -35,22 +35,22 @@ func index(w http.ResponseWriter, r *http.Request) error {
 
 func generalPage(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	key_name := vars["key_name"]
+	keyName := vars["keyName"]
 	data := map[string]interface{}{
-		"title":       key_name,
+		"title":       keyName,
 		"description": "this is a starter app for GAE/Go",
-		"body":        key_name,
+		"body":        keyName,
 	}
 	return executeTemplate(w, "page", 200, data)
 }
 
 func articlePage(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	key_name := vars["key_name"]
+	keyName := vars["keyName"]
 	data := map[string]interface{}{
-		"title":       key_name,
+		"title":       keyName,
 		"description": "this is a starter app for GAE/Go",
-		"body":        key_name,
+		"body":        keyName,
 	}
 	return executeTemplate(w, "page", 200, data)
 }
