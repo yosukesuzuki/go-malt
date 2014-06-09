@@ -17,6 +17,7 @@
 package main
 
 import (
+	//	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -107,6 +108,14 @@ func executeTemplate(w http.ResponseWriter, name string, status int, data interf
 	return tpls[name].ExecuteTemplate(w, "base", data)
 }
 
+/*
+func executeJSON(w http.ResponseWriter, status int, data interface{}) error {
+	jsonData, _ := json.Marshal(data)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	return w.Write(jsonData)
+}
+*/
 // eq reports whether the first argument is equal to
 // any of the remaining arguments.
 // https://groups.google.com/group/golang-nuts/msg/a720bf35f454288b
