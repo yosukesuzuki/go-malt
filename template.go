@@ -17,7 +17,8 @@
 package main
 
 import (
-	//	"encoding/json"
+	"appengine"
+	"doc"
 	"errors"
 	"fmt"
 	"net/http"
@@ -28,6 +29,22 @@ import (
 	"text/template"
 	"time"
 )
+
+type handlerFunc func(http.ResponseWriter, *http.Request) error
+
+func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	err := f(w, r)
+	if err != nil {
+		appengine.NewContext(r).Errorf("Error %s", err.Error())
+		if e, ok := err.(doc.GetError); ok {
+			http.Error(w, "Error getting files from "+e.Host+".", http.StatusInternalServerError)
+		} else if appengine.IsCapabilityDisabled(err) || appengine.IsOverQuota(err) {
+			http.Error(w, "Internal error: "+err.Error(), http.StatusInternalServerError)
+		} else {
+			http.Error(w, "Internal Error", http.StatusInternalServerError)
+		}
+	}
+}
 
 func mapFmt(kvs ...interface{}) (map[string]interface{}, error) {
 	if len(kvs)%2 != 0 {
@@ -108,14 +125,6 @@ func executeTemplate(w http.ResponseWriter, name string, status int, data interf
 	return tpls[name].ExecuteTemplate(w, "base", data)
 }
 
-/*
-func executeJSON(w http.ResponseWriter, status int, data interface{}) error {
-	jsonData, _ := json.Marshal(data)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	return w.Write(jsonData)
-}
-*/
 // eq reports whether the first argument is equal to
 // any of the remaining arguments.
 // https://groups.google.com/group/golang-nuts/msg/a720bf35f454288b
