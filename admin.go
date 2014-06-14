@@ -1,9 +1,8 @@
 package main
 
 import (
-	//"appengine"
-	//"doc"
 	"encoding/json"
+	//	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -14,13 +13,17 @@ func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Write(jsonData)
 }
 
-func adminPageEntityList(w http.ResponseWriter, r *http.Request) {
-	data := map[string]interface{}{
-		"title":       "admin top",
-		"description": "this is a starter app for GAE/Go",
-		"body":        "admin page",
+func handleAdminPage(w http.ResponseWriter, r *http.Request) {
+	//vars := mux.Vars(r)
+	switch r.Method {
+	case "GET":
+		data := map[string]interface{}{
+			"title":       "admin top",
+			"description": "this is a starter app for GAE/Go",
+			"body":        "admin page",
+		}
+		executeJSON(w, data)
 	}
-	executeJSON(w, data)
 }
 
 // adminIndex renders index page for admin
