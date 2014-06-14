@@ -10,6 +10,7 @@ func init() {
 	r := mux.NewRouter()
 	s := r.PathPrefix("/admin").Subrouter()
 	s.Handle("/", handlerFunc(adminIndex))
+	s.HandleFunc("/rest/metadata/{modelName}", modelMetaData)
 	s.HandleFunc("/rest/adminpage", handleAdminPage)
 	r.Handle("/article/{keyName}", handlerFunc(articlePage))
 	r.Handle("/{keyName}", handlerFunc(generalPage))
