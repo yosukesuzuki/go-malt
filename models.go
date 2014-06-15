@@ -16,6 +16,16 @@ import (
 	//    "github.com/PuerkitoBio/goquery"
 )
 
+// ModelField is struct to return metadata of a Model
+type ModelField struct {
+	FieldName   string `json:"field_name"`
+	FieldType   string `json:"field_type"`
+	VerboseName string `json:"verbose_name"`
+}
+
+//Map for Models which can be used in restful API
+var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+
 // AdminPage stores content for general pages
 type AdminPage struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`

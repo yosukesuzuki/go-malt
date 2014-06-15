@@ -1,10 +1,14 @@
 package main
 
 import (
+	"appengine"
+	"appengine/datastore"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"reflect"
+	"time"
 )
 
 func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
@@ -16,14 +20,34 @@ func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
 
 func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	//vars := mux.Vars(r)
+	//modelName := vars["modelName"]
+	//var model = models[modelName]
+	modelName := "AdminPage"
 	switch r.Method {
 	case "GET":
-		data := map[string]interface{}{
-			"title":       "admin top",
-			"description": "this is a starter app for GAE/Go",
-			"body":        "admin page",
+		c := appengine.NewContext(r)
+		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
+		var items []AdminPage
+		if _, err := q.GetAll(c, &items); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		executeJSON(w, data)
+		executeJSON(w, map[string]interface{}{"model_name": modelName, "items": items})
+	case "POST":
+		c := appengine.NewContext(r)
+		adminPage := &AdminPage{
+			DisplayPage: true,
+			Title:       "hoge",
+			URL:         "hogeurl",
+			Update:      time.Now(),
+			Create:      time.Now(),
+		}
+		key := datastore.NewKey(c, modelName, "hoge", 0, nil)
+		_, err := datastore.Put(c, key, adminPage)
+		if err != nil {
+			log.Println("test")
+		}
+		executeJSON(w, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
 }
 
@@ -36,16 +60,6 @@ func adminIndex(w http.ResponseWriter, r *http.Request) error {
 	}
 	return executeTemplate(w, "index", 200, data)
 }
-
-// ModelField is struct to return metadata of a Model
-type ModelField struct {
-	FieldName   string `json:"field_name"`
-	FieldType   string `json:"field_type"`
-	VerboseName string `json:"verbose_name"`
-}
-
-//Map for Models which can be used in restful API
-var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
 
 func adminModels(w http.ResponseWriter, r *http.Request) {
 	var itemList []string
