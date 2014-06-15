@@ -47,7 +47,15 @@ type ModelField struct {
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
 
-func modelMetaData(w http.ResponseWriter, r *http.Request) {
+func adminModels(w http.ResponseWriter, r *http.Request) {
+	var itemList []string
+	for k, _ := range models {
+		itemList = append(itemList, k)
+	}
+	executeJSON(w, map[string]interface{}{"models": itemList})
+}
+
+func adminMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	modelName := vars["modelName"]
 	var model = models[modelName]

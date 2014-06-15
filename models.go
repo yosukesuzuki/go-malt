@@ -35,7 +35,7 @@ type Article struct {
 	Title       string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL"`
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
-	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"URL"`
+	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"Images"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"Text" verbose_name:"TagString"`
 	Tags        []string  `datastore:"tags,noindex" json:"tags" datastore_type:"StringList" verbose_name:"Tags"`
