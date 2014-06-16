@@ -5,6 +5,7 @@ import (
 	"appengine/datastore"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/oleiade/reflections"
 	"log"
 	"net/http"
 	"reflect"
@@ -22,7 +23,8 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	//vars := mux.Vars(r)
 	//modelName := vars["modelName"]
 	//var model = models[modelName]
-	modelName := "AdminPage"
+	modelVar := "adminpage"
+	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
 		c := appengine.NewContext(r)
@@ -32,21 +34,9 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		executeJSON(w, map[string]interface{}{"model_name": modelName, "items": items})
+		executeJSON(w, map[string]interface{}{"model_name": modelVar, "items": items})
 	case "POST":
-		c := appengine.NewContext(r)
-		adminPage := &AdminPage{
-			DisplayPage: true,
-			Title:       "hoge",
-			URL:         "hogeurl",
-			Update:      time.Now(),
-			Create:      time.Now(),
-		}
-		key := datastore.NewKey(c, modelName, "hoge", 0, nil)
-		_, err := datastore.Put(c, key, adminPage)
-		if err != nil {
-			log.Println("test")
-		}
+		setNewEntity(w, r, modelVar)
 		executeJSON(w, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
 }
@@ -81,4 +71,33 @@ func adminMetaData(w http.ResponseWriter, r *http.Request) {
 		itemList = append(itemList, modelField)
 	}
 	executeJSON(w, map[string]interface{}{"model_name": modelName, "fields": itemList})
+}
+
+func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
+	c := appengine.NewContext(r)
+	modelName := modelNames[modelVar]
+	modelStruct := models[modelVar]
+	keyName := r.FormValue("url")
+	if keyName == "" {
+		keyName = time.Now().Format("20060102150405")
+	}
+	key := datastore.NewKey(c, modelName, keyName, 0, nil)
+	s := reflect.ValueOf(modelStruct).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		log.Println(typeOfT.Field(i).Name)
+		err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		if err != nil {
+			set_default_err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+			if set_default_err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+	_, err := datastore.Put(c, key, modelStruct)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

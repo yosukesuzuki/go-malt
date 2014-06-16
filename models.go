@@ -25,6 +25,13 @@ type ModelField struct {
 
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
+var defaultValues = map[string]interface{}{"Boolean": false,
+	"String":   "",
+	"Text":     "",
+	"Integer":  0,
+	"DateTime": time.Now(),
+}
 
 // AdminPage stores content for general pages
 type AdminPage struct {
