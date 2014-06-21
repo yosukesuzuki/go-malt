@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// return JSON with Content type header
 func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
 	jsonData, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -19,6 +20,7 @@ func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
 	w.Write(jsonData)
 }
 
+// handleAdminPage is REST handler of AdminPage struct.
 func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	//vars := mux.Vars(r)
 	//modelName := vars["modelName"]
@@ -51,14 +53,16 @@ func adminIndex(w http.ResponseWriter, r *http.Request) error {
 	return executeTemplate(w, "index", 200, data)
 }
 
+// adminModels returns list of models
 func adminModels(w http.ResponseWriter, r *http.Request) {
 	var itemList []string
-	for k, _ := range models {
+	for k := range models {
 		itemList = append(itemList, k)
 	}
 	executeJSON(w, map[string]interface{}{"models": itemList})
 }
 
+// adminMetaData returns Fields data of a struct
 func adminMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	modelName := vars["modelName"]
@@ -73,23 +77,24 @@ func adminMetaData(w http.ResponseWriter, r *http.Request) {
 	executeJSON(w, map[string]interface{}{"model_name": modelName, "fields": itemList})
 }
 
+// setNewEntity put a new entity to datastore which is sent in FormValue
 func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	c := appengine.NewContext(r)
 	modelName := modelNames[modelVar]
 	modelStruct := models[modelVar]
+	s := reflect.ValueOf(modelStruct).Elem()
+	typeOfT := s.Type()
 	keyName := r.FormValue("url")
 	if keyName == "" {
 		keyName = time.Now().Format("20060102150405")
 	}
 	key := datastore.NewKey(c, modelName, keyName, 0, nil)
-	s := reflect.ValueOf(modelStruct).Elem()
-	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		log.Println(typeOfT.Field(i).Name)
 		err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 		if err != nil {
-			set_default_err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
-			if set_default_err != nil {
+			setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+			if setDefaultErr != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
