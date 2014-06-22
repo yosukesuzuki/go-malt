@@ -1,0 +1,26 @@
+language: go
+before_install:
+    - pushd $HOME
+    - wget -q https://storage.googleapis.com/appengine-sdks/featured/go_appengine_sdk_linux_amd64-1.9.6.zip 
+    - unzip -q go_appengine_sdk_linux_amd64-1.9.6.zip
+    - cd google_appengine
+    - export GAE=$(pwd)
+    - popd
+install:
+    - cd $TRAVIS_BUILD_DIR
+    - export GOPATH=$TRAVIS_BUILD_DIR
+    - export GOHOME=$GAE
+    - export PATH=$GAE:$PATH
+    - which go
+    - go env
+    - go get github.com/gorilla/mux 
+    - go get github.com/gorilla/site/doc
+    - go get github.com/oleiade/reflections
+before_script:
+    - wget https://github.com/n1k0/casperjs/archive/1.1-beta3.tar.gz -O /tmp/casper.tar.gz
+    - tar -xvf /tmp/casper.tar.gz
+    - export PATH=$PATH:$PWD/casperjs-1.0.2/bin/
+script:
+    - goapp serve
+    - casperjs test tests/admin.go.js
+
