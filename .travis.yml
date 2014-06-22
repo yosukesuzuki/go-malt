@@ -14,7 +14,7 @@ install:
     - which go
     - go env
     - go get github.com/gorilla/mux 
-    - go get github.com/gorilla/site/doc
+    - go get github.com/gorilla/site
     - go get github.com/oleiade/reflections
 before_script:
     - wget https://github.com/n1k0/casperjs/archive/1.1-beta3.tar.gz -O /tmp/casper.tar.gz
