@@ -18,10 +18,10 @@ package main
 
 import (
 	"appengine"
-	//"doc"
+	"doc"
 	"errors"
 	"fmt"
-	"github.com/gorilla/site/doc"
+	//"github.com/gorilla/site/doc"
 	"net/http"
 	"net/url"
 	"reflect"
