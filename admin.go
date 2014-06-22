@@ -44,6 +44,28 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleAdminPage is REST handler of AdminPage struct.
+func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	keyName := vars["keyName"]
+	//modelName := vars["modelName"]
+	//var model = models[modelName]
+	modelVar := "adminpage"
+	modelName := modelNames[modelVar]
+	switch r.Method {
+	case "GET":
+		c := appengine.NewContext(r)
+		var item AdminPage
+		key := datastore.NewKey(c, modelName, keyName, 0, nil)
+		err := datastore.Get(c, key, &item)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
+	}
+}
+
 // adminIndex renders index page for admin
 func adminIndex(w http.ResponseWriter, r *http.Request) error {
 	data := map[string]interface{}{
