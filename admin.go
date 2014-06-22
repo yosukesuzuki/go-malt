@@ -51,19 +51,27 @@ func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
 	//modelName := vars["modelName"]
 	//var model = models[modelName]
 	modelVar := "adminpage"
-	modelName := modelNames[modelVar]
+	//modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
 		c := appengine.NewContext(r)
-		var item AdminPage
-		key := datastore.NewKey(c, modelName, keyName, 0, nil)
-		err := datastore.Get(c, key, &item)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		item := getAdminPageEntity(c, w, keyName)
+		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
+	case "PUT":
+		c := appengine.NewContext(r)
+		item := getAdminPageEntity(c, w, keyName)
 		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
 	}
+}
+
+func getAdminPageEntity(c appengine.Context, w http.ResponseWriter, keyName string) AdminPage {
+	var item AdminPage
+	key := datastore.NewKey(c, "AdminPage", keyName, 0, nil)
+	err := datastore.Get(c, key, &item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return item
 }
 
 // adminIndex renders index page for admin
