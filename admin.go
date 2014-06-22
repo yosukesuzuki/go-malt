@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"strconv"
 	"time"
 )
 
@@ -91,14 +92,33 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	key := datastore.NewKey(c, modelName, keyName, 0, nil)
 	for i := 0; i < s.NumField(); i++ {
 		log.Println(typeOfT.Field(i).Name)
-		err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
-		if err != nil {
-			setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
-			if setDefaultErr != nil {
+		if typeOfT.Field(i).Tag.Get("datastore_type") == "Boolean" {
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
+			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+		} else if typeOfT.Field(i).Tag.Get("datastore_type") == "Integer" {
+			tmpStringInt, _ := strconv.Atoi(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, tmpStringInt)
+			if err != nil {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, 0)
+				if setDefaultErr != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+		} else {
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			if err != nil {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 		}
+
 	}
 	_, err := datastore.Put(c, key, modelStruct)
 	if err != nil {

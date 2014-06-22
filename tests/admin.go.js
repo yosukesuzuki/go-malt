@@ -36,4 +36,50 @@ casper.thenOpen(baseURL+'/admin/rest/metadata/adminpage',function(){
     this.test.assertEqual(jsonData.model_name,'adminpage','title should be adminpage');
 });
 
+casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+    method: "post",
+    data: {
+        title: 'title1',
+        url: 'url1',
+        pageorder: 1,
+        content: 'foobar',
+        displaypage: 'on',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'created','return created message');
+});
+
+casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+    method: "post",
+    data: {
+        title: 'title0',
+        url: 'url0',
+        pageorder: 0,
+        content: 'foobar',
+        displaypage: '',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'created','return created message');
+});
+
+casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.items[0].displaypage,false,'displaypage of the first entity should be false');
+    this.test.assertEqual(jsonData.items[0].title,'title0','title of the first entity should be title0');
+    this.test.assertEqual(jsonData.items[0].url,'url0','url of the first entity should be url0');
+    this.test.assertEqual(jsonData.items[0].pageorder,0,'content of the first entity should be 0');
+    this.test.assertEqual(jsonData.items[0].content,'foobar','title of the first entity should be foobar');
+    this.test.assertEqual(jsonData.items[1].displaypage,true,'displaypage of the first entity should be true');
+    this.test.assertEqual(jsonData.items[1].title,'title1','title of the first entity should be title1');
+    this.test.assertEqual(jsonData.items[1].url,'url1','url of the first entity should be url1');
+    this.test.assertEqual(jsonData.items[1].pageorder,1,'content of the first entity should be 1');
+    this.test.assertEqual(jsonData.items[1].content,'foobar','title of the first entity should be foobar');
+});
 casper.run();
