@@ -17,8 +17,11 @@
 package main
 
 import (
+	"appengine"
+	"doc"
 	"errors"
 	"fmt"
+	//"github.com/gorilla/site/doc"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -27,6 +30,22 @@ import (
 	"text/template"
 	"time"
 )
+
+type handlerFunc func(http.ResponseWriter, *http.Request) error
+
+func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	err := f(w, r)
+	if err != nil {
+		appengine.NewContext(r).Errorf("Error %s", err.Error())
+		if e, ok := err.(doc.GetError); ok {
+			http.Error(w, "Error getting files from "+e.Host+".", http.StatusInternalServerError)
+		} else if appengine.IsCapabilityDisabled(err) || appengine.IsOverQuota(err) {
+			http.Error(w, "Internal error: "+err.Error(), http.StatusInternalServerError)
+		} else {
+			http.Error(w, "Internal Error", http.StatusInternalServerError)
+		}
+	}
+}
 
 func mapFmt(kvs ...interface{}) (map[string]interface{}, error) {
 	if len(kvs)%2 != 0 {
@@ -135,21 +154,21 @@ func eq(args ...interface{}) bool {
 // GetBaseURL return base url for google analytics
 func GetBaseURL() string {
 	//Change This to Your Google Analytics ID
-	url := "goappstarter.appspot.com"
+	const url = "goappstarter.appspot.com"
 	return url
 }
 
 // GetGaID return id for google analytics
 func GetGaID() string {
 	//Change This to Your Google Analytics ID
-	gaID := "UA-51746203-1"
+	const gaID = "UA-51746203-1"
 	return gaID
 }
 
 // GetFbAppID returns id for Facebook
 func GetFbAppID() string {
 	//Change This to Your FB App ID
-	fbAppID := "1491547807729755"
+	const fbAppID = "1491547807729755"
 	return fbAppID
 }
 
