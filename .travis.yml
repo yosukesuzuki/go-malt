@@ -21,8 +21,7 @@ install:
     - go env
     - go get github.com/gorilla/mux 
     - go get github.com/oleiade/reflections
-before_script:
-    - goapp serve &
 script:
+    - goapp serve &
     - casperjs test tests/admin.go.js
 
