@@ -6,6 +6,9 @@ before_install:
     - cd go_appengine
     - export GAE=$(pwd)
     - popd
+    - wget https://github.com/n1k0/casperjs/archive/1.1-beta3.tar.gz -O /tmp/casper.tar.gz
+    - tar -xvf /tmp/casper.tar.gz
+    - export PATH=$PATH:$PWD/casperjs-1.0.2/bin/
 install:
     - cd $TRAVIS_BUILD_DIR
     - export GOPATH=$TRAVIS_BUILD_DIR
@@ -16,9 +19,6 @@ install:
     - go get github.com/gorilla/mux 
     - go get github.com/oleiade/reflections
 before_script:
-    - wget https://github.com/n1k0/casperjs/archive/1.1-beta3.tar.gz -O /tmp/casper.tar.gz
-    - tar -xvf /tmp/casper.tar.gz
-    - export PATH=$PATH:$PWD/casperjs-1.0.2/bin/
     - goapp serve &
 script:
     - casperjs test tests/admin.go.js
