@@ -58,9 +58,8 @@ func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
 		item := getAdminPageEntity(c, w, keyName)
 		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
 	case "PUT":
-		c := appengine.NewContext(r)
-		item := getAdminPageEntity(c, w, keyName)
-		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
+		updateEntity(w, r, modelVar)
+		executeJSON(w, map[string]interface{}{"model_name": modelVar, "message": "updated"})
 	}
 }
 
@@ -121,7 +120,9 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	}
 	key := datastore.NewKey(c, modelName, keyName, 0, nil)
 	for i := 0; i < s.NumField(); i++ {
-		log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
+		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 		if typeOfT.Field(i).Tag.Get("datastore_type") == "Boolean" {
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
 			if err != nil {
@@ -153,6 +154,67 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	_, err := datastore.Put(c, key, modelStruct)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
+	c := appengine.NewContext(r)
+	modelName := modelNames[modelVar]
+	modelStruct := models[modelVar]
+	vars := mux.Vars(r)
+	keyName := vars["keyName"]
+	s := reflect.ValueOf(modelStruct).Elem()
+	typeOfT := s.Type()
+	key := datastore.NewKey(c, modelName, keyName, 0, nil)
+	getErr := datastore.Get(c, key, modelStruct)
+	if getErr != nil {
+		http.Error(w, getErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	for i := 0; i < s.NumField(); i++ {
+		//log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
+		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		if typeOfT.Field(i).Tag.Get("datastore_type") == "Boolean" {
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		} else if typeOfT.Field(i).Tag.Get("datastore_type") == "Integer" {
+			tmpStringInt, _ := strconv.Atoi(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, tmpStringInt)
+			if err != nil {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, 0)
+				if setDefaultErr != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+		} else {
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			if err != nil {
+				if typeOfT.Field(i).Tag.Get("json") == "update" {
+					setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+					if setDefaultErr != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+				} else if typeOfT.Field(i).Tag.Get("json") == "created" {
+					log.Println("skipped")
+					continue
+				} else {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+
+	}
+	_, putErr := datastore.Put(c, key, modelStruct)
+	if putErr != nil {
+		http.Error(w, putErr.Error(), http.StatusInternalServerError)
 		return
 	}
 }
