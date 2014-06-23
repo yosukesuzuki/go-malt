@@ -116,7 +116,6 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
 });
 */
 
-/*
 casper.thenOpen(baseURL+'/admin/rest/adminpage/url0', {
     method: "delete",
 }, function() {
@@ -134,6 +133,5 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage/url1', {
     var jsonData = JSON.parse(this.getPageContent());
     this.test.assertEqual(jsonData.message,'deleted','return deleted message');
 });
-*/
 
 casper.run();
