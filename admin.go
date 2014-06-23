@@ -32,6 +32,7 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		c := appengine.NewContext(r)
 		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
+		//items := modelLists[modelVar]
 		var items []AdminPage
 		if _, err := q.GetAll(c, &items); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,37 +49,30 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	keyName := vars["keyName"]
-	//modelName := vars["modelName"]
-	//var model = models[modelName]
 	modelVar := "adminpage"
-	//modelName := modelNames[modelVar]
+	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
 		c := appengine.NewContext(r)
-		item := getAdminPageEntity(c, w, keyName)
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": item})
+		modelStruct := models[modelVar]
+		key := datastore.NewKey(c, modelName, keyName, 0, nil)
+		err := datastore.Get(c, key, modelStruct)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct})
 	case "PUT":
 		updateEntity(w, r, modelVar)
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
 	case "DELETE":
 		c := appengine.NewContext(r)
-		key := datastore.NewKey(c, "AdminPage", keyName, 0, nil)
+		key := datastore.NewKey(c, modelName, keyName, 0, nil)
 		err := datastore.Delete(c, key)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "deleted"})
 	}
-}
-
-func getAdminPageEntity(c appengine.Context, w http.ResponseWriter, keyName string) AdminPage {
-	var item AdminPage
-	key := datastore.NewKey(c, "AdminPage", keyName, 0, nil)
-	err := datastore.Get(c, key, &item)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	return item
 }
 
 // adminIndex renders index page for admin

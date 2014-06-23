@@ -25,6 +25,7 @@ type ModelField struct {
 
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+var modelLists = map[string]interface{}{"adminpage": &AdminPageList{}, "article": &ArticleList{}}
 var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
 var defaultValues = map[string]interface{}{"Boolean": false,
 	"String":   "",
@@ -46,6 +47,10 @@ type AdminPage struct {
 	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"Created At"`
 }
 
+type AdminPageList struct {
+	Items []AdminPage
+}
+
 // Article stores daily update contents
 type Article struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
@@ -59,4 +64,8 @@ type Article struct {
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"Updated At"`
 	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"Created At"`
+}
+
+type ArticleList struct {
+	Items []Article
 }
