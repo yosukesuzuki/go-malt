@@ -13,6 +13,7 @@ func init() {
 	s.HandleFunc("/rest/metadata", adminModels)
 	s.HandleFunc("/rest/metadata/{modelName}", adminMetaData)
 	s.HandleFunc("/rest/adminpage", handleAdminPage)
+	s.HandleFunc("/rest/adminpage/{keyName}", handleAdminPageKeyName)
 	r.Handle("/article/{keyName}", handlerFunc(articlePage))
 	r.Handle("/{keyName}", handlerFunc(generalPage))
 	r.Handle("/", handlerFunc(index))
