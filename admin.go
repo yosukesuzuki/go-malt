@@ -14,10 +14,10 @@ import (
 )
 
 // return JSON with Content type header
-func executeJSON(w http.ResponseWriter, data map[string]interface{}) {
+func executeJSON(w http.ResponseWriter, statusCode int, data map[string]interface{}) {
 	jsonData, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
+	w.WriteHeader(statusCode)
 	w.Write(jsonData)
 }
 
@@ -37,10 +37,10 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		executeJSON(w, map[string]interface{}{"model_name": modelVar, "items": items})
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
 	case "POST":
 		setNewEntity(w, r, modelVar)
-		executeJSON(w, map[string]interface{}{"model_name": modelName, "message": "created"})
+		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
 }
 
@@ -56,10 +56,18 @@ func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		c := appengine.NewContext(r)
 		item := getAdminPageEntity(c, w, keyName)
-		executeJSON(w, map[string]interface{}{"model_name": modelVar, "item": item})
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": item})
 	case "PUT":
 		updateEntity(w, r, modelVar)
-		executeJSON(w, map[string]interface{}{"model_name": modelVar, "message": "updated"})
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
+	case "DELETE":
+		c := appengine.NewContext(r)
+		key := datastore.NewKey(c, "AdminPage", keyName, 0, nil)
+		err := datastore.Delete(c, key)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "deleted"})
 	}
 }
 
@@ -89,7 +97,7 @@ func adminModels(w http.ResponseWriter, r *http.Request) {
 	for k := range models {
 		itemList = append(itemList, k)
 	}
-	executeJSON(w, map[string]interface{}{"models": itemList})
+	executeJSON(w, 200, map[string]interface{}{"models": itemList})
 }
 
 // adminMetaData returns Fields data of a struct
@@ -104,7 +112,7 @@ func adminMetaData(w http.ResponseWriter, r *http.Request) {
 		modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
 		itemList = append(itemList, modelField)
 	}
-	executeJSON(w, map[string]interface{}{"model_name": modelName, "fields": itemList})
+	executeJSON(w, 200, map[string]interface{}{"model_name": modelName, "fields": itemList})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue

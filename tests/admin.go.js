@@ -47,7 +47,7 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     }
 }, function() {
     this.echo("POST request has been sent.")
-    this.test.assertHttpStatus(200);
+    this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
     this.test.assertEqual(jsonData.message,'created','return created message');
 });
@@ -63,9 +63,13 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     }
 }, function() {
     this.echo("POST request has been sent.")
-    this.test.assertHttpStatus(200);
+    this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
     this.test.assertEqual(jsonData.message,'created','return created message');
+});
+
+casper.wait(1000, function() {
+    this.echo("I've waited for a second.");
 });
 
 casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
@@ -111,4 +115,23 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
     this.test.assertEqual(jsonData.items[0].content,'foobar-2','title of the first entity should be foobar');
 });
 */
+
+casper.thenOpen(baseURL+'/admin/rest/adminpage/url0', {
+    method: "delete",
+}, function() {
+    this.echo("DELETE request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'deleted','return deleted message');
+});
+
+casper.thenOpen(baseURL+'/admin/rest/adminpage/url1', {
+    method: "delete",
+}, function() {
+    this.echo("DELETE request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'deleted','return deleted message');
+});
+
 casper.run();
