@@ -46,10 +46,10 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleAdminPage is REST handler of AdminPage struct.
-func handleAdminPageKeyName(w http.ResponseWriter, r *http.Request) {
+func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	keyName := vars["keyName"]
-	modelVar := "adminpage"
+	modelVar := vars["modelVar"]
 	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
@@ -95,10 +95,10 @@ func adminModels(w http.ResponseWriter, r *http.Request) {
 }
 
 // adminMetaData returns Fields data of a struct
-func adminMetaData(w http.ResponseWriter, r *http.Request) {
+func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	modelName := vars["modelName"]
-	var model = models[modelName]
+	modelVar := vars["modelVar"]
+	var model = models[modelVar]
 	var itemList []ModelField
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
@@ -106,7 +106,7 @@ func adminMetaData(w http.ResponseWriter, r *http.Request) {
 		modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
 		itemList = append(itemList, modelField)
 	}
-	executeJSON(w, 200, map[string]interface{}{"model_name": modelName, "fields": itemList})
+	executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "fields": itemList})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue
