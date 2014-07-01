@@ -18,8 +18,8 @@ import (
 
 // ModelField is struct to return metadata of a Model
 type ModelField struct {
-	FieldName   string `json:"field_name"`
-	FieldType   string `json:"field_type"`
+	Title       string `json:"title"`
+	FieldType   string `json:"type"`
 	VerboseName string `json:"verbose_name"`
 }
 

@@ -99,14 +99,19 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	modelVar := vars["modelVar"]
 	var model = models[modelVar]
-	var itemList []ModelField
+	schema := map[string]interface{}{"type": "object"}
+	var properties map[string]interface{}
+	properties = make(map[string]interface{})
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
-		modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
-		itemList = append(itemList, modelField)
+		//modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
+		properties[typeOfT.Field(i).Tag.Get("json")] = map[string]interface{}{"type": typeOfT.Field(i).Tag.Get("datastore_type"), "title": typeOfT.Field(i).Tag.Get("verbose_name")}
+		//itemList = append(itemList, modelField)
 	}
-	executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "fields": itemList})
+	schema["properties"] = properties
+
+	executeJSON(w, 200, map[string]interface{}{"schema": schema})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue
