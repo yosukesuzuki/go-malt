@@ -85,6 +85,16 @@ func adminIndex(w http.ResponseWriter, r *http.Request) error {
 	return executeTemplate(w, "index", 200, data)
 }
 
+// adminIndex renders index page for admin
+func adminForm(w http.ResponseWriter, r *http.Request) error {
+	data := map[string]interface{}{
+		"title":       "admin form",
+		"description": "this is a starter app for GAE/Go",
+		"body":        "admin form",
+	}
+	return executeTemplate(w, "form", 200, data)
+}
+
 // adminModels returns list of models
 func adminModels(w http.ResponseWriter, r *http.Request) {
 	var itemList []string
@@ -99,19 +109,28 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	modelVar := vars["modelVar"]
 	var model = models[modelVar]
-	schema := map[string]interface{}{"type": "object"}
+	modelName := modelNames[modelVar]
+	schema := map[string]interface{}{"type": "object", "title": modelName}
 	var properties map[string]interface{}
+	var itemList []map[string]interface{}
+	//var itemList []ModelField
 	properties = make(map[string]interface{})
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
-		//modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
-		properties[typeOfT.Field(i).Tag.Get("json")] = map[string]interface{}{"type": typeOfT.Field(i).Tag.Get("datastore_type"), "title": typeOfT.Field(i).Tag.Get("verbose_name")}
-		//itemList = append(itemList, modelField)
+		if typeOfT.Field(i).Tag.Get("verbose_name") != "-" {
+			jsonSchemaType := jsonSchemaTypes[typeOfT.Field(i).Tag.Get("datastore_type")]
+			properties[typeOfT.Field(i).Tag.Get("json")] = map[string]interface{}{"type": jsonSchemaType,
+				"title": typeOfT.Field(i).Tag.Get("verbose_name")}
+			modelField := map[string]interface{}{"key": typeOfT.Field(i).Tag.Get("json")}
+			if val, ok := jsonSchemaFields[typeOfT.Field(i).Tag.Get("datastore_type")]; ok {
+				modelField["type"] = val
+			}
+			itemList = append(itemList, modelField)
+		}
 	}
 	schema["properties"] = properties
-
-	executeJSON(w, 200, map[string]interface{}{"schema": schema})
+	executeJSON(w, 200, map[string]interface{}{"schema": schema, "form": itemList})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue

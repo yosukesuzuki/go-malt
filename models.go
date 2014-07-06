@@ -17,11 +17,15 @@ import (
 )
 
 // ModelField is struct to return metadata of a Model
+/*
 type ModelField struct {
-	Title       string `json:"title"`
-	FieldType   string `json:"type"`
-	VerboseName string `json:"verbose_name"`
+	Key       string `json:"key"`
+	FieldType string `json:"type"`
 }
+*/
+
+var jsonSchemaTypes = map[string]string{"Boolean": "boolean", "String": "string", "Text": "string", "Integer": "integer", "DateTime": "string"}
+var jsonSchemaFields = map[string]string{"Text": "textarea"}
 
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
@@ -41,10 +45,10 @@ type AdminPage struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL"`
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"URL"`
-	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"Images"`
+	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
-	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"Updated At"`
-	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"Created At"`
+	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
+	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
 type AdminPageList struct {
@@ -58,12 +62,12 @@ type Article struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL"`
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
-	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"Images"`
+	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"Text" verbose_name:"TagString"`
-	Tags        []string  `datastore:"tags,noindex" json:"tags" datastore_type:"StringList" verbose_name:"Tags"`
+	Tags        []string  `datastore:"tags" json:"tags" datastore_type:"StringList" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
-	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"Updated At"`
-	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"Created At"`
+	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
+	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
 type ArticleList struct {
