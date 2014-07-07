@@ -112,25 +112,28 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	modelName := modelNames[modelVar]
 	schema := map[string]interface{}{"type": "object", "title": modelName}
 	var properties map[string]interface{}
-	var itemList []map[string]interface{}
-	//var itemList []ModelField
 	properties = make(map[string]interface{})
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		if typeOfT.Field(i).Tag.Get("verbose_name") != "-" {
 			jsonSchemaType := jsonSchemaTypes[typeOfT.Field(i).Tag.Get("datastore_type")]
-			properties[typeOfT.Field(i).Tag.Get("json")] = map[string]interface{}{"type": jsonSchemaType,
-				"title": typeOfT.Field(i).Tag.Get("verbose_name")}
-			modelField := map[string]interface{}{"key": typeOfT.Field(i).Tag.Get("json")}
-			if val, ok := jsonSchemaFields[typeOfT.Field(i).Tag.Get("datastore_type")]; ok {
-				modelField["type"] = val
+			property := map[string]interface{}{
+				"type":       jsonSchemaType,
+				"title":      typeOfT.Field(i).Tag.Get("verbose_name"),
+				"fieldOrder": i,
 			}
-			itemList = append(itemList, modelField)
+			switch typeOfT.Field(i).Tag.Get("datastore_type") {
+			case "String":
+				property["maxLength"] = 500
+			case "DateTime":
+				property["format"] = "date-time"
+			}
+			properties[typeOfT.Field(i).Tag.Get("json")] = property
 		}
 	}
 	schema["properties"] = properties
-	executeJSON(w, 200, map[string]interface{}{"schema": schema, "form": itemList})
+	executeJSON(w, 200, map[string]interface{}{"schema": schema})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue
