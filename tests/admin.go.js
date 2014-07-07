@@ -21,15 +21,15 @@ casper.then(function(){
     this.test.assertHttpStatus(200);
 });
 
-// test of /admin/rest/metadata
-casper.thenOpen(baseURL+'/admin/rest/metadata',function(){
+// test of /admin/rest/models
+casper.thenOpen(baseURL+'/admin/rest/models',function(){
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
     this.test.assertEqual(jsonData.models.length,2,'total count of models should be 2');
 });
 
-// test of /admin/rest/metadata/adminpage
-casper.thenOpen(baseURL+'/admin/rest/metadata/adminpage',function(){
+// test of /admin/rest/schema/adminpage
+casper.thenOpen(baseURL+'/admin/rest/schema/adminpage',function(){
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
     //this.test.assertEqual(jsonData.fields.length,9,'total count of models should be 9');

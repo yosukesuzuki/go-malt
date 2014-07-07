@@ -16,26 +16,21 @@ import (
 	//    "github.com/PuerkitoBio/goquery"
 )
 
-// ModelField is struct to return metadata of a Model
-/*
-type ModelField struct {
-	Key       string `json:"key"`
-	FieldType string `json:"type"`
-}
-*/
-
 var jsonSchemaTypes = map[string]string{"Boolean": "boolean", "String": "string", "Text": "string", "Integer": "integer", "DateTime": "string"}
 var jsonSchemaFields = map[string]string{"Text": "textarea"}
-
-//Map for Models which can be used in restful API
-var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
-var modelLists = map[string]interface{}{"adminpage": &AdminPageList{}, "article": &ArticleList{}}
-var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
 var defaultValues = map[string]interface{}{"Boolean": false,
 	"String":   "",
 	"Text":     "",
 	"Integer":  0,
 	"DateTime": time.Now(),
+}
+
+//Map for Models which can be used in restful API
+var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
+var modelDescriptions = map[string]string{
+	"adminpage": "model for storing general information",
+	"article":   "model for storing article",
 }
 
 // AdminPage stores content for general pages

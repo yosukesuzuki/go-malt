@@ -32,7 +32,6 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		c := appengine.NewContext(r)
 		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
-		//items := modelLists[modelVar]
 		var items []AdminPage
 		if _, err := q.GetAll(c, &items); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -97,9 +96,9 @@ func adminForm(w http.ResponseWriter, r *http.Request) error {
 
 // adminModels returns list of models
 func adminModels(w http.ResponseWriter, r *http.Request) {
-	var itemList []string
+	var itemList []map[string]string
 	for k := range models {
-		itemList = append(itemList, k)
+		itemList = append(itemList, map[string]string{"name": modelNames[k], "description": modelDescriptions[k]})
 	}
 	executeJSON(w, 200, map[string]interface{}{"models": itemList})
 }
