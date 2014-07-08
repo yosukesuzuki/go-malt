@@ -98,7 +98,7 @@ func adminForm(w http.ResponseWriter, r *http.Request) error {
 func adminModels(w http.ResponseWriter, r *http.Request) {
 	var itemList []map[string]string
 	for k := range models {
-		itemList = append(itemList, map[string]string{"name": modelNames[k], "description": modelDescriptions[k]})
+		itemList = append(itemList, map[string]string{"name": modelNames[k], "description": modelDescriptions[k], "id": k})
 	}
 	executeJSON(w, 200, map[string]interface{}{"models": itemList})
 }
