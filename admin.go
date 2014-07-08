@@ -81,7 +81,7 @@ func adminIndex(w http.ResponseWriter, r *http.Request) error {
 		"description": "this is a starter app for GAE/Go",
 		"body":        "admin page",
 	}
-	return executeTemplate(w, "index", 200, data)
+	return executeTemplate(w, "adminIndex", 200, data)
 }
 
 // adminIndex renders index page for admin
