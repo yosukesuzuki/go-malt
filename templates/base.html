@@ -11,17 +11,10 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <title>{{.title}} Go App Starter for GAE/Go</title>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
+    <link rel="stylesheet" href="/media/css/flatly.min.css">
     <!-- Optional theme -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-    <style>
-    body {
-        min-height: 200px;
-    }
-    .navbar-fixed-top {
-        margin-bottom: 19px;
-    }
-    </style>
+    <link rel="stylesheet" href="/media/css/app.css">
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
     <script src="/media/js/ui-bootstrap-tpls-0.11.0.min.js"></script>
     <script src="/media/js/app.js"></script>
@@ -70,7 +63,8 @@
             </div>
         </div>
     </header>
-    <div class="container">
+    <div class="header-placeholder"></div>
+    <div role="main">
     {{ template "content" .}}
     <hr/>
     </div> <!-- /container -->

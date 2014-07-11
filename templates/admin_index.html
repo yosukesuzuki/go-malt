@@ -1,0 +1,22 @@
+{{ define "content"}}
+<!-- Main component for a primary marketing message or call to action -->
+<header class="bs-header text-center" id="overview">
+<div class="container">
+    <h1>
+        {{ .body }}
+    </h1>
+</div>
+</header>
+<div class="container">
+    <div class="row" ng-controller="AdminController">
+        <div class="col-md-4" ng-repeat="model in models">
+            <h2>{{`{{model.name}}`}}</h2>
+            <p>
+            {{`{{model.description}}`}}
+            </p>
+            <p><a class="btn btn-default" href="/admin/form#{{`{{model.id}}`}}">Go&raquo;</a></p>
+        </div>
+    </div>
+</div>
+<script src="/media/js/admin.index.js"></script>
+{{end}}
