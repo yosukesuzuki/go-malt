@@ -1,6 +1,10 @@
-angular.module("myApp", [])
-.controller("AdminController", function($scope, $http) {
-    $http.get('/admin/rest/models').success(function(data) {
-        $scope.models = data.models;
+$(document).ready(function(){
+    $.getJSON("/admin/rest/models",function(data){
+        var vue = new Vue({
+            el: '#models',
+            data: {
+                models: data.models 
+            }
+        });
     });
 });

@@ -1,6 +1,6 @@
 {{define "base"}}
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,60 +11,48 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <title>{{.title}} Go App Starter for GAE/Go</title>
     <!-- Latest compiled and minified CSS -->
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"-->
     <link rel="stylesheet" href="/media/css/flatly.min.css">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="/media/css/app.css">
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-    <script src="/media/js/ui-bootstrap-tpls-0.11.0.min.js"></script>
-    <script src="/media/js/app.js"></script>
+    <style>
+    body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    }
+    </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   </head>
   <body>
-    <header class="navbar navbar-default navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-3" ng-click="isCollapsed = !isCollapsed">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand visible-xs" href="#">GAE Go Starter</a>
-                </div>
-                <nav class="hidden-xs">
-                    <ul class="nav navbar-nav">
-                        <a href="#top" role="button" class="navbar-brand">
-                            GAE Go Starter
-                        </a>
-                        <li class="dropdown">
-                            <a role="button" class="dropdown-toggle">
-                                Directives <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#accordion">Accordion</a></li><li><a href="#alert">Alert</a></li><li><a href="#buttons">Buttons</a></li><li><a href="#carousel">Carousel</a></li><li><a href="#collapse">Collapse</a></li><li><a href="#datepicker">Datepicker</a></li><li><a href="#dropdown">Dropdown</a></li><li><a href="#modal">Modal</a></li><li><a href="#pagination">Pagination</a></li><li><a href="#popover">Popover</a></li><li><a href="#progressbar">Progressbar</a></li><li><a href="#rating">Rating</a></li><li><a href="#tabs">Tabs</a></li><li><a href="#timepicker">Timepicker</a></li><li><a href="#tooltip">Tooltip</a></li><li><a href="#typeahead">Typeahead</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#getting_started">Getting started</a></li>
-                    </ul>
-                </nav>
-                <nav class="visible-xs" collapse="!isCollapsed">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#getting_started" ng-click="isCollapsed = !isCollapsed">Getting started</a></li>
-                        <li><a href="#directives_small" ng-click="isCollapsed = !isCollapsed">Directives</a></li>
-                    </ul>
-                </nav>
-            </div>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
         </div>
-    </header>
-    <div class="header-placeholder"></div>
-    <div role="main">
+        <div class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+    <div>
     {{ template "content" .}}
     <hr/>
     </div> <!-- /container -->
@@ -89,7 +77,10 @@
         </div>
     </footer>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+
     <!-- Latest compiled and minified JavaScript -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="/media/js/vue.min.js"></script>
     <div id="fb-root"></div>
     <script>
     (function(d, s, id) {

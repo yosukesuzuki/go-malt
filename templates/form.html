@@ -1,12 +1,8 @@
 {{ define "content"}}
 <!-- Main component for a primary marketing message or call to action -->
-<form></form>
-<script type="text/javascript">
-    //form#adminpage/create
-    //form#adminpage/update/<key_name>
-    $(document).ready(function(){
-        $.getJSON("/admin/rest/metadata/adminpage",function(data){
-        });
-    });
-</script>
+<div class="container" id="formContainer">
+    <h1>{{`{{formtitle}}`}}</h1>
+    <form></form>
+</div>
+<script src="/media/js/admin.form.js"></script>
 {{end}}
