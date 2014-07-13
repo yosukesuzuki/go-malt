@@ -36,6 +36,7 @@ casper.thenOpen(baseURL+'/admin/rest/schema/adminpage',function(){
     //this.test.assertEqual(jsonData.model_name,'adminpage','title should be adminpage');
 });
 
+// add entity by post
 casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     method: "post",
     data: {
@@ -52,6 +53,7 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     this.test.assertEqual(jsonData.message,'created','return created message');
 });
 
+// add entity by post
 casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     method: "post",
     data: {
@@ -132,6 +134,51 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage/url1', {
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
     this.test.assertEqual(jsonData.message,'deleted','return deleted message');
+});
+
+// add entity by post
+casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+    method: "post",
+    data: {
+        title: 'title1',
+        url: 'url1',
+        pageorder: 1,
+        content: 'foobar',
+        displaypage: 'on',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(201);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'created','return created message');
+});
+
+// add entity by post
+casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+    method: "post",
+    data: {
+        title: 'title0',
+        url: 'url0',
+        pageorder: 0,
+        content: 'foobar',
+        displaypage: '',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(201);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message,'created','return created message');
+});
+
+casper.thenOpen(baseURL+'/admin/form/#/adminpage/list',function(){
+    this.test.assertHttpStatus(200);
+});
+
+casper.waitForSelector('tr td:first-child', function() {
+    var tempArr = this.getElementsInfo('tr td:first-child');
+    for(var i=0;i<tempArr.length;i++){
+        this.test.assertEqual('title'+i,tempArr[i].text,'check table list');
+    }
 });
 
 casper.run();
