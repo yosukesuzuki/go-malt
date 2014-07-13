@@ -18,7 +18,10 @@ $(document).ready(function(){
                 }
             });
             var formElementArr = [];
-            $.each(data.schema.properties,function(i,val){formElementArr.push(val)});
+            $.each(data.schema.properties,function(i,val){
+                val.name = i;
+                formElementArr.push(val)
+            });
             formElementArr.sort(function(a, b){
                 var x = a.fieldOrder;
                 var y = b.fieldOrder;
