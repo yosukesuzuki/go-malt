@@ -1,8 +1,30 @@
 {{ define "content"}}
 <!-- Main component for a primary marketing message or call to action -->
-<div class="container" id="formContainer">
+<div class="container" id="crudContainer">
     <h1>{{`{{formtitle}}`}}</h1>
-    <form></form>
+    <div id="formContainer">
+    </div>
 </div>
 <script src="/media/js/admin.form.js"></script>
+<script type="x-template" id="modelListTable">
+    <p><a href="/admin/form/#/{{`{{modelName}}`}}/create" class="btn btn-primary">Create new entity</a></p>
+    <table id="content-list-table" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th></th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-repeat="items">
+                <td>{{`{{title}}`}}</td>
+                <td>{{`{{update | dateFormat }}`}}</td>
+                <td><a href="/admin/form/#/{{`{{modelName}}`}}/update/{{`{{url}}`}}">Update</a></td>
+                <td><a href="/admin/form/#/{{`{{modelName}}`}}/delete/{{`{{url}}`}}">Delete</a></td>
+            </tr>
+        </tbody>
+    </table>
+</script>
 {{end}}

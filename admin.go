@@ -44,7 +44,30 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handleAdminPage is REST handler of AdminPage struct.
+// handleArticlePage is REST handler of AdminPage struct.
+func handleArticlePage(w http.ResponseWriter, r *http.Request) {
+	//vars := mux.Vars(r)
+	//modelName := vars["modelName"]
+	//var model = models[modelName]
+	modelVar := "article"
+	modelName := modelNames[modelVar]
+	switch r.Method {
+	case "GET":
+		c := appengine.NewContext(r)
+		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
+		var items []Article
+		if _, err := q.GetAll(c, &items); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
+	case "POST":
+		setNewEntity(w, r, modelVar)
+		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
+	}
+}
+
+// handleModelKeyName is REST handler of Model struct.
 func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	keyName := vars["keyName"]

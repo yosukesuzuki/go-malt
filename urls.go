@@ -14,6 +14,7 @@ func init() {
 	s.HandleFunc("/rest/models", adminModels)
 	s.HandleFunc("/rest/schema/{modelVar}", modelMetaData)
 	s.HandleFunc("/rest/adminpage", handleAdminPage)
+	s.HandleFunc("/rest/article", handleArticlePage)
 	s.HandleFunc("/rest/{modelVar}/{keyName}", handleModelKeyName)
 	r.Handle("/article/{keyName}", handlerFunc(articlePage))
 	r.Handle("/{keyName}", handlerFunc(generalPage))
