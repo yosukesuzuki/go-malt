@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -135,6 +136,7 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	schema := map[string]interface{}{"type": "object", "title": modelName}
 	var properties map[string]interface{}
 	properties = make(map[string]interface{})
+	var requiredProperties []string
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
@@ -152,9 +154,13 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 				property["format"] = "date-time"
 			}
 			properties[typeOfT.Field(i).Tag.Get("json")] = property
+			if strings.Contains(typeOfT.Field(i).Tag.Get("datastore"), "required") {
+				requiredProperties = append(requiredProperties, typeOfT.Field(i).Tag.Get("json"))
+			}
 		}
 	}
 	schema["properties"] = properties
+	schema["required"] = requiredProperties
 	executeJSON(w, 200, map[string]interface{}{"schema": schema})
 }
 

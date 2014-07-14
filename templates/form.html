@@ -30,18 +30,18 @@
 <script type="x-template" id="modelForm">
     <form class="form-horizontal" role="form">
         <div class="form-group" v-repeat="items">
-            <label class="col-sm-2 control-label">{{`{{title}}`}}</label>
+            <label class="col-sm-2 control-label" for="f_{{`{{name}}`}}">{{`{{title}}`}}</label>
             <div class="col-sm-10" v-if="type == 'string' && maxLength <= 500">
-                <input type="text" class="form-control" name="{{`{{name}}`}}">
+                <input type="text" class="form-control" name="{{`{{name}}`}}" id="f_{{`{{name}}`}}">
             </div>
             <div class="col-sm-10" v-if="type == 'integer'">
-                <input type="number" class="form-control" name="{{`{{name}}`}}">
+                <input type="number" class="form-control" name="{{`{{name}}`}}" id="f_{{`{{name}}`}}">
             </div>
             <div class="col-sm-10" v-if="type == 'boolean'">
-                <input type="checkbox" class="form-control" name="{{`{{name}}`}}">
+                <input type="checkbox" class="form-control" name="{{`{{name}}`}}" id="f_{{`{{name}}`}}">
             </div>
             <div class="col-sm-10" v-if="type == 'string' && !maxLength">
-                <textarea class="form-control" rows="3" name="{{`{{name}}`}}"></textarea>
+                <textarea class="form-control" rows="3" name="{{`{{name}}`}}" id="f_{{`{{name}}`}}"></textarea>
             </div>
         </div>
         <div class="form-group">

@@ -36,7 +36,7 @@ var modelDescriptions = map[string]string{
 // AdminPage stores content for general pages
 type AdminPage struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
-	Title       string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`
+	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL"`
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
@@ -53,7 +53,7 @@ type AdminPageList struct {
 // Article stores daily update contents
 type Article struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
-	Title       string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`
+	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL"`
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
