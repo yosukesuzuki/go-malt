@@ -174,6 +174,10 @@ casper.thenOpen(baseURL+'/admin/form/#/adminpage/list',function(){
     this.test.assertHttpStatus(200);
 });
 
+casper.wait(1000, function() {
+    this.echo("I've waited for a second.");
+});
+
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
     for(var i=0;i<tempArr.length;i++){
