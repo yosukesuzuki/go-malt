@@ -20,7 +20,7 @@ $(document).ready(function(){
             var formElementArr = [];
             $.each(data.schema.properties,function(i,val){
                 val.name = i;
-                var tmpObject = {frmName:val.name,frmTitle:val.title,frmType:val.type,frmFieldOrder:val.fieldOrder};
+                var tmpObject = {frmName:val.name,frmTitle:val.title,frmType:val.type,frmFieldOrder:val.fieldOrder,frmValue:""};
                 if(typeof val.maxLength !== "undefined"){
                     tmpObject.frmMaxLength = val.maxLength;
                 }
@@ -49,11 +49,21 @@ $(document).ready(function(){
                     break;
                 case "create":
                     var createVue = new Vue({
-                        el: "#formContainer",
-                        template: "#modelForm",
-                        data: {
-                                items: formElementArr,
+                    el: "#formContainer",
+                    template: "#modelForm",
+                    data: {
+                        items: formElementArr,
+                    },
+                    methods: {
+                        submitUpdate: function (e) {
+                            e.preventDefault()
+                            console.log(this.$data)
+                            console.log(this.$data.forms)
+                        },
+                        cancel: function (e) {
+                            location.href = "/admin/form/#/"+that.modelName+"/list";
                         }
+                    }
                     });
                     break;
                 case "update":
