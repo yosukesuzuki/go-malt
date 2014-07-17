@@ -20,11 +20,15 @@ $(document).ready(function(){
             var formElementArr = [];
             $.each(data.schema.properties,function(i,val){
                 val.name = i;
-                formElementArr.push(val)
+                var tmpObject = {frmName:val.name,frmTitle:val.title,frmType:val.type,frmFieldOrder:val.fieldOrder};
+                if(typeof val.maxLength !== "undefined"){
+                    tmpObject.frmMaxLength = val.maxLength;
+                }
+                formElementArr.push(tmpObject)
             });
             formElementArr.sort(function(a, b){
-                var x = a.fieldOrder;
-                var y = b.fieldOrder;
+                var x = a.frmFieldOrder;
+                var y = b.frmFieldOrder;
                 if (x > y) return 1;
                 if (x < y) return -1;
                 return 0;
