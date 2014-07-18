@@ -180,7 +180,7 @@ casper.wait(1000, function() {
 
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
-    for(var i=0;i<tempArr.length;i++){
+    for(var i=0;i<2;i++){
         this.test.assertEqual('title'+i,tempArr[i].text,'check table list');
     }
 });

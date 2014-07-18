@@ -65,7 +65,7 @@ $(document).ready(function(){
                             console.log(this.$data);
                             postData = {}
                             $.each(this.$data.items,function(i,val){
-                                if(val == true){
+                                if(val.frmValue == true){
                                     postData[val.frmName] = "on";
                                 }else{
                                     postData[val.frmName] = val.frmValue;
