@@ -208,8 +208,16 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			}
 		}
 	}
-	_, err := datastore.Put(c, key, modelStruct)
-	if err != nil {
+	urlValue, err := reflections.GetField(modelStruct, "URL")
+	if urlValue == "" {
+		setUrlErr := reflections.SetField(modelStruct, "URL", keyName)
+		if setUrlErr != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	_, putErr := datastore.Put(c, key, modelStruct)
+	if putErr != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

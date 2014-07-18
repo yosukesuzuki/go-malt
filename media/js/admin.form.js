@@ -34,6 +34,7 @@ $(document).ready(function(){
                 return 0;
             });
             var crudMethod = that.crudMethod;
+
             switch(crudMethod){
                 case "list":
                     $.getJSON("/admin/rest/"+that.modelName,function(listData){
@@ -46,6 +47,10 @@ $(document).ready(function(){
                             }
                         });
                     });
+                    if((typeof entityKey !== "undefined") && (entityKey == "success")){
+                        $("#postAlert").html('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>success</div>');
+                        $("#postAlert").css("display","block");
+                    }
                     break;
                 case "create":
                     var createVue = new Vue({
@@ -56,9 +61,23 @@ $(document).ready(function(){
                     },
                     methods: {
                         submitUpdate: function (e) {
-                            e.preventDefault()
-                            console.log(this.$data)
-                            console.log(this.$data.forms)
+                            e.preventDefault();
+                            console.log(this.$data);
+                            postData = {}
+                            $.each(this.$data.items,function(i,val){
+                                if(val == true){
+                                    postData[val.frmName] = "on";
+                                }else{
+                                    postData[val.frmName] = val.frmValue;
+                                }
+                            });
+                            $.post("/admin/rest/"+that.modelName,postData,function(data){
+                                if(data.message == "created"){
+                                    location.href = "/admin/form/#/"+that.modelName+"/list/success";
+                                }else{
+                                    $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
+                                }
+                            });
                         },
                         cancel: function (e) {
                             location.href = "/admin/form/#/"+that.modelName+"/list";
