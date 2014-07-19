@@ -174,15 +174,24 @@ casper.thenOpen(baseURL+'/admin/form/#/adminpage/list',function(){
     this.test.assertHttpStatus(200);
 });
 
-casper.wait(1000, function() {
-    this.echo("I've waited for a second.");
-});
-
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
-    for(var i=0;i<2;i++){
-        this.test.assertEqual('title'+i,tempArr[i].text,'check table list');
-    }
+    this.test.assertEqual(tempArr.length !== 0,true,'check table list');
+});
+
+casper.then(function() {
+        this.click('#createEntity');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.fill('form.form-horizontal',{
+        'displaypage':true,
+        'title':'title999',
+        'url':'url999',
+        'pageorder':999,
+        'content':'content999',
+        'externalurl':'link999',
+    },true)
 });
 
 casper.run();
