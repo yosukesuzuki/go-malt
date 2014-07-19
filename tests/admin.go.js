@@ -4,32 +4,32 @@ baseURL = 'http://localhost:8080';
 
 casper.start();
 
-casper.open(baseURL+'/admin/');
+casper.open(baseURL + '/admin/');
 
 casper.then(function() {
     this.echo(this.getTitle());
     var currentUrl = this.getCurrentUrl();
-    if(currentUrl.match(/login/)){
+    if (currentUrl.match(/login/)) {
         this.click('#admin');
         this.thenClick('#submit-login');
     }
 });
 
 // test of /admin/
-casper.then(function(){
+casper.then(function() {
     this.echo(this.getTitle());
     this.test.assertHttpStatus(200);
 });
 
 // test of /admin/rest/models
-casper.thenOpen(baseURL+'/admin/rest/models',function(){
+casper.thenOpen(baseURL + '/admin/rest/models', function() {
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.models.length,2,'total count of models should be 2');
+    this.test.assertEqual(jsonData.models.length, 2, 'total count of models should be 2');
 });
 
 // test of /admin/rest/schema/adminpage
-casper.thenOpen(baseURL+'/admin/rest/schema/adminpage',function(){
+casper.thenOpen(baseURL + '/admin/rest/schema/adminpage', function() {
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
     //this.test.assertEqual(jsonData.fields.length,9,'total count of models should be 9');
@@ -37,7 +37,7 @@ casper.thenOpen(baseURL+'/admin/rest/schema/adminpage',function(){
 });
 
 // add entity by post
-casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage', {
     method: "post",
     data: {
         title: 'title1',
@@ -50,11 +50,11 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     this.echo("POST request has been sent.")
     this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'created','return created message');
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
 });
 
 // add entity by post
-casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage', {
     method: "post",
     data: {
         title: 'title0',
@@ -67,26 +67,26 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     this.echo("POST request has been sent.")
     this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'created','return created message');
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
 });
 
 casper.wait(1000, function() {
     this.echo("I've waited for a second.");
 });
 
-casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
+casper.thenOpen(baseURL + '/admin/rest/adminpage', function() {
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.items[0].displaypage,false,'displaypage of the first entity should be false');
-    this.test.assertEqual(jsonData.items[0].title,'title0','title of the first entity should be title0');
-    this.test.assertEqual(jsonData.items[0].url,'url0','url of the first entity should be url0');
-    this.test.assertEqual(jsonData.items[0].pageorder,0,'content of the first entity should be 0');
-    this.test.assertEqual(jsonData.items[0].content,'foobar','title of the first entity should be foobar');
-    this.test.assertEqual(jsonData.items[1].displaypage,true,'displaypage of the first entity should be true');
-    this.test.assertEqual(jsonData.items[1].title,'title1','title of the first entity should be title1');
-    this.test.assertEqual(jsonData.items[1].url,'url1','url of the first entity should be url1');
-    this.test.assertEqual(jsonData.items[1].pageorder,1,'content of the first entity should be 1');
-    this.test.assertEqual(jsonData.items[1].content,'foobar','title of the first entity should be foobar');
+    this.test.assertEqual(jsonData.items[0].displaypage, false, 'displaypage of the first entity should be false');
+    this.test.assertEqual(jsonData.items[0].title, 'title0', 'title of the first entity should be title0');
+    this.test.assertEqual(jsonData.items[0].url, 'url0', 'url of the first entity should be url0');
+    this.test.assertEqual(jsonData.items[0].pageorder, 0, 'content of the first entity should be 0');
+    this.test.assertEqual(jsonData.items[0].content, 'foobar', 'title of the first entity should be foobar');
+    this.test.assertEqual(jsonData.items[1].displaypage, true, 'displaypage of the first entity should be true');
+    this.test.assertEqual(jsonData.items[1].title, 'title1', 'title of the first entity should be title1');
+    this.test.assertEqual(jsonData.items[1].url, 'url1', 'url of the first entity should be url1');
+    this.test.assertEqual(jsonData.items[1].pageorder, 1, 'content of the first entity should be 1');
+    this.test.assertEqual(jsonData.items[1].content, 'foobar', 'title of the first entity should be foobar');
 });
 
 /*
@@ -118,26 +118,26 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
 });
 */
 
-casper.thenOpen(baseURL+'/admin/rest/adminpage/url0', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage/url0', {
     method: "delete",
 }, function() {
     this.echo("DELETE request has been sent.")
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'deleted','return deleted message');
+    this.test.assertEqual(jsonData.message, 'deleted', 'return deleted message');
 });
 
-casper.thenOpen(baseURL+'/admin/rest/adminpage/url1', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage/url1', {
     method: "delete",
 }, function() {
     this.echo("DELETE request has been sent.")
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'deleted','return deleted message');
+    this.test.assertEqual(jsonData.message, 'deleted', 'return deleted message');
 });
 
 // add entity by post
-casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage', {
     method: "post",
     data: {
         title: 'title1',
@@ -150,11 +150,11 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     this.echo("POST request has been sent.")
     this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'created','return created message');
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
 });
 
 // add entity by post
-casper.thenOpen(baseURL+'/admin/rest/adminpage', {
+casper.thenOpen(baseURL + '/admin/rest/adminpage', {
     method: "post",
     data: {
         title: 'title0',
@@ -167,31 +167,50 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage', {
     this.echo("POST request has been sent.")
     this.test.assertHttpStatus(201);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.message,'created','return created message');
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
 });
 
-casper.thenOpen(baseURL+'/admin/form/#/adminpage/list',function(){
+casper.thenOpen(baseURL + '/admin/form/#/adminpage/list', function() {
     this.test.assertHttpStatus(200);
 });
 
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
-    this.test.assertEqual(tempArr.length !== 0,true,'check table list');
+    this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
 });
 
 casper.then(function() {
-        this.click('#createEntity');
+    this.click('#createEntity');
 });
 
 casper.waitForSelector('form.form-horizontal', function() {
-    this.fill('form.form-horizontal',{
-        'displaypage':true,
-        'title':'title999',
-        'url':'url999',
-        'pageorder':999,
-        'content':'content999',
-        'externalurl':'link999',
-    },true)
+    this.fill('form.form-horizontal', {
+        'displaypage': true,
+        'title': 'title999',
+        'url': 'url999',
+        'pageorder': 999,
+        'content': 'content999',
+        'externalurl': 'link999',
+    }, true)
 });
 
+casper.waitForSelector('tr td:first-child', function() {
+    var tempArr = this.getElementsInfo('tr td:first-child');
+    this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
+    this.mouseEvent('click', 'tr td:nth-child(3) a:first-child');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.fill('form.form-horizontal', {
+        'displaypage': false,
+    }, true);
+})
+
+casper.waitForSelector('tr td:first-child', function() {
+    this.mouseEvent('click', 'tr td:nth-child(3) a:first-child');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.test.assertEqual(false,this.getFormValues('form.form-horizontal').displaypage,'check data update');
+})
 casper.run();
