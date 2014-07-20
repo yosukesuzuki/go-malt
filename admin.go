@@ -3,6 +3,7 @@ package main
 import (
 	"appengine"
 	"appengine/datastore"
+	"appengine/memcache"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/oleiade/reflections"
@@ -31,18 +32,59 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
-		c := appengine.NewContext(r)
-		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
-		var items []AdminPage
-		if _, err := q.GetAll(c, &items); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		items := getAdminPageList(w, r)
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
 	case "POST":
 		setNewEntity(w, r, modelVar)
 		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
+}
+
+func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
+	c := appengine.NewContext(r)
+	perPage := 10
+	cursorKey := "adminpage_cursor"
+	tmpOffsetValue := r.FormValue("offset")
+	var offsetParam int
+	if tmpOffsetValue != "" {
+		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
+	} else {
+		offsetParam = 0
+	}
+	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
+	q := datastore.NewQuery("AdminPage").Order("-update").Limit(perPage)
+	item, err := memcache.Get(c, cursorKeyCurrent)
+	if err == nil {
+		cursor, err := datastore.DecodeCursor(string(item.Value))
+		if err == nil {
+			q = q.Start(cursor)
+		}
+	}
+	var items []AdminPage
+	// Iterate over the results.
+	t := q.Run(c)
+	for {
+		var ap AdminPage
+		_, err := t.Next(&ap)
+		if err == datastore.Done {
+			break
+		}
+		if err != nil {
+			c.Errorf("fetching next AdminPage: %v", err)
+			break
+		}
+		items = append(items, ap)
+	}
+	nextOffset := offsetParam + perPage
+	cursorKeyNext := cursorKey + strconv.Itoa(nextOffset)
+	// Get updated cursor and store it for next time.
+	if cursor, err := t.Cursor(); err == nil {
+		memcache.Set(c, &memcache.Item{
+			Key:   cursorKeyNext,
+			Value: []byte(cursor.String()),
+		})
+	}
+	return items
 }
 
 // handleArticlePage is REST handler of AdminPage struct.
