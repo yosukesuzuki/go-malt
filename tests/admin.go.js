@@ -88,9 +88,8 @@ casper.thenOpen(baseURL + '/admin/rest/adminpage', function() {
     this.test.assertEqual(jsonData.items[1].pageorder, 1, 'content of the first entity should be 1');
     this.test.assertEqual(jsonData.items[1].content, 'foobar', 'title of the first entity should be foobar');
 });
-
 /*
-something wrong with PUT request by casperjs
+//something wrong with PUT request by casperjs
 casper.thenOpen(baseURL+'/admin/rest/adminpage/url0', {
     method: "PUT",
     data: {
@@ -110,14 +109,13 @@ casper.thenOpen(baseURL+'/admin/rest/adminpage/url0', {
 casper.thenOpen(baseURL+'/admin/rest/adminpage',function(){
     this.test.assertHttpStatus(200);
     var jsonData = JSON.parse(this.getPageContent());
-    this.test.assertEqual(jsonData.items[0].displaypage,true,'displaypage of the first entity should be false');
+//    this.test.assertEqual(jsonData.items[0].displaypage,true,'displaypage of the first entity should be false');
     this.test.assertEqual(jsonData.items[0].title,'title0-2','title of the first entity should be title0');
     this.test.assertEqual(jsonData.items[0].url,'url0','url of the first entity should be url0');
     this.test.assertEqual(jsonData.items[0].pageorder,0,'content of the first entity should be 0');
     this.test.assertEqual(jsonData.items[0].content,'foobar-2','title of the first entity should be foobar');
 });
 */
-
 casper.thenOpen(baseURL + '/admin/rest/adminpage/url0', {
     method: "delete",
 }, function() {
@@ -211,6 +209,6 @@ casper.waitForSelector('tr td:first-child', function() {
 });
 
 casper.waitForSelector('form.form-horizontal', function() {
-    this.test.assertEqual(false,this.getFormValues('form.form-horizontal').displaypage,'check data update');
+    this.test.assertEqual(false, this.getFormValues('form.form-horizontal').displaypage, 'check data update');
 })
 casper.run();
