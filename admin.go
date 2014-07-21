@@ -89,7 +89,8 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 			Value: []byte(cursor.String()),
 		})
 	}
-	listDataSet := map[string]interface{}{"items": items, "has_next": hasNext, "next_offset": nextOffset, "model_name": modelVar}
+	listDataSet := map[string]interface{}{"items": items,
+		"has_next": hasNext, "next_offset": nextOffset, "per_page": perPage, "model_name": modelVar}
 	return listDataSet
 }
 

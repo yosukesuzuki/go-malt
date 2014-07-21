@@ -71,13 +71,32 @@ $(document).ready(function() {
 
             switch (crudMethod) {
                 case "list":
-                    $.getJSON("/admin/rest/" + that.modelName, function(listData) {
+                    var offset = parseInt(that.entityKey);
+                    var requestUrl = "/admin/rest/" + that.modelName;
+                    if(!isNaN(offset)){
+                        requestUrl += "?offset="+offset
+                    }
+                    $.getJSON(requestUrl, function(listData) {
+                        var nextPage = false;
+                        var previousPage = false;
+                        if(listData.has_next){
+                            nextPage ="/admin/form/#/" + that.modelName+"/list/"+listData.next_offset;
+                        }
+                        if(!isNaN(offset)){
+                            if(offset - listData.per_page != 0){
+                                previousPage ="/admin/form/#/" + that.modelName+"/list/"+(offset - listData.per_page);
+                            }else{
+                                previousPage ="/admin/form/#/" + that.modelName+"/list";
+                            }
+                        }
                         var listVue = new Vue({
                             el: "#formContainer",
                             template: "#modelListTable",
                             data: {
                                 items: listData.items,
-                                modelName: listData.model_name
+                                modelName: listData.model_name,
+                                next:nextPage,
+                                previous:previousPage
                             }
                         });
                     });

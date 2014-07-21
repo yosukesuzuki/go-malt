@@ -27,6 +27,10 @@
             </tr>
         </tbody>
     </table>
+    <ul class="pager" id="pagination">
+      <li v-if="previous != false"><a href="{{`{{previous}}`}}">&laquo; Previous</a></li>
+      <li v-if="next != false"><a href="{{`{{next}}`}}">Next &raquo;</a></li>
+    </ul>
 </script>
 <script type="x-template" id="modelForm">
     <form class="form-horizontal" role="form"  v-on="submit:submitUpdate">
