@@ -46,9 +46,7 @@ type AdminPage struct {
 	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
-type AdminPageList struct {
-	Items []AdminPage
-}
+type AdminPageList []AdminPage
 
 // Article stores daily update contents
 type Article struct {
@@ -65,6 +63,4 @@ type Article struct {
 	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
-type ArticleList struct {
-	Items []Article
-}
+type ArticleList []Article

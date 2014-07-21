@@ -44,7 +44,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
-	perPage := 10
+	perPage := 20
 	cursorKey := "adminpage_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
@@ -62,7 +62,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 			q = q.Start(cursor)
 		}
 	}
-	var items []AdminPage
+	var items AdminPageList
 	var hasNext bool
 	hasNext = true
 	// Iterate over the results.

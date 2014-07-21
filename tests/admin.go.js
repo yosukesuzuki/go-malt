@@ -211,4 +211,30 @@ casper.waitForSelector('tr td:first-child', function() {
 casper.waitForSelector('form.form-horizontal', function() {
     this.test.assertEqual(false, this.getFormValues('form.form-horizontal').displaypage, 'check data update');
 })
+
+var i = 0;
+casper.repeat(30,function(){
+    i++;
+    this.thenOpen(baseURL + '/admin/rest/adminpage', {
+        method: "post",
+        data: {
+            title: 'title'+i,
+            url: 'url'+i,
+            pageorder: i,
+            content: 'foobar',
+            displaypage: 'on',
+        }
+    }, function() {
+        this.echo("POST request has been sent.")
+        this.test.assertHttpStatus(201);
+        var jsonData = JSON.parse(this.getPageContent());
+        this.test.assertEqual(jsonData.message, 'created', 'return created message');
+    });
+});
+
+//change offset value to match to perPage value in admin.go
+casper.thenOpen(baseURL + '/admin/rest/adminpage?offset=20', function() {
+    this.test.assertHttpStatus(200);
+});
+
 casper.run();
