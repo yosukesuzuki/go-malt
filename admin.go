@@ -32,15 +32,17 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
-		items := getAdminPageList(w, r)
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
+		listDataSet := getAdminPageList(w, r)
+		executeJSON(w, 200, listDataSet)
 	case "POST":
 		setNewEntity(w, r, modelVar)
 		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
 }
 
-func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
+func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	modelVar := "adminpage"
+	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
 	perPage := 10
 	cursorKey := "adminpage_cursor"
@@ -52,7 +54,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
 		offsetParam = 0
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery("AdminPage").Order("-update").Limit(perPage)
+	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -61,6 +63,8 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
 		}
 	}
 	var items []AdminPage
+	var hasNext bool
+	hasNext = true
 	// Iterate over the results.
 	t := q.Run(c)
 	for {
@@ -71,6 +75,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
 		}
 		if err != nil {
 			c.Errorf("fetching next AdminPage: %v", err)
+			hasNext = false
 			break
 		}
 		items = append(items, ap)
@@ -84,7 +89,8 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) []AdminPage {
 			Value: []byte(cursor.String()),
 		})
 	}
-	return items
+	listDataSet := map[string]interface{}{"items": items, "has_next": hasNext, "next_offset": nextOffset, "model_name": modelVar}
+	return listDataSet
 }
 
 // handleArticlePage is REST handler of AdminPage struct.
