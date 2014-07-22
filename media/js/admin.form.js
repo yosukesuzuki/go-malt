@@ -104,8 +104,9 @@ $(document).ready(function() {
                                     if(window.confirm('Delete this entity?')){
                                         $.del("/admin/rest/" + that.modelName + "/" + e.targetVM.$data.url,{},function(delResponse) {
                                             if (delResponse.message == "deleted") {
-                                                location.href = "/admin/form/#/" + that.modelName + "/list/success";
+                                                //location.href = "/admin/form/#/" + that.modelName + "/list/success";
                                                 //e.targetVM.$data;
+                                                console.log("deleted");
                                             } else {
                                                 $("#postAlert").html('<div class="alert alert-danger" role="alert">error deleting data</div>');
                                             }
