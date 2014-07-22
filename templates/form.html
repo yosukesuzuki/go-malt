@@ -22,8 +22,8 @@
             <tr v-repeat="items">
                 <td>{{`{{title}}`}}</td>
                 <td>{{`{{update | dateFormat }}`}}</td>
-                <td><a href="#/{{`{{modelName}}`}}/update/{{`{{url}}`}}">Update</a></td>
-                <td><a href="#/{{`{{modelName}}`}}/delete/{{`{{url}}`}}">Delete</a></td>
+                <td><a class="btn btn-default btn-sm" href="#/{{`{{modelName}}`}}/update/{{`{{url}}`}}">Update</a></td>
+                <td><button class="btn btn-danger btn-sm" v-on="click: deleteEntity">delete</button></td>
             </tr>
         </tbody>
     </table>
