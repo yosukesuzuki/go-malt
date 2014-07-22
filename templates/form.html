@@ -28,8 +28,8 @@
         </tbody>
     </table>
     <ul class="pager" id="pagination">
-      <li v-if="previous != false"><a href="{{`{{previous}}`}}">&laquo; Previous</a></li>
-      <li v-if="next != false"><a href="{{`{{next}}`}}">Next &raquo;</a></li>
+      <li v-if="previous != false"><a href="{{`{{previous}}`}}" id="previousButton">&laquo; Previous</a></li>
+      <li v-if="next != false"><a href="{{`{{next}}`}}" id="nextButton">Next &raquo;</a></li>
     </ul>
 </script>
 <script type="x-template" id="modelForm">

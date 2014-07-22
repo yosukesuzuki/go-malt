@@ -213,13 +213,13 @@ casper.waitForSelector('form.form-horizontal', function() {
 })
 
 var i = 0;
-casper.repeat(30,function(){
+casper.repeat(30, function() {
     i++;
     this.thenOpen(baseURL + '/admin/rest/adminpage', {
         method: "post",
         data: {
-            title: 'title'+i,
-            url: 'url'+i,
+            title: 'title' + i,
+            url: 'url' + i,
             pageorder: i,
             content: 'foobar',
             displaypage: 'on',
@@ -233,8 +233,17 @@ casper.repeat(30,function(){
 });
 
 //change offset value to match to perPage value in admin.go
-casper.thenOpen(baseURL + '/admin/rest/adminpage?offset=20', function() {
+casper.thenOpen(baseURL + '/admin/form/#/adminpage/list', function() {
     this.test.assertHttpStatus(200);
+    this.test.assertEqual(this.exists('#nextButton'),true,'found next button');
+    this.click('#nextButton');
+    this.test.assertEqual(this.getCurrentUrl(),baseURL + '/admin/form/#/adminpage/list/20','next button works')
+});
+
+casper.waitForSelector('#previousButton',function(){
+    this.test.assertEqual(this.exists('#nextButton'),false,'not found next button');
+    this.click('#previousButton');
+    this.test.assertEqual(this.getCurrentUrl(),baseURL + '/admin/form/#/adminpage/list','previous button works')
 });
 
 casper.run();

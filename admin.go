@@ -64,7 +64,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	}
 	var items AdminPageList
 	var hasNext bool
-	hasNext = true
+	hasNext = false
 	// Iterate over the results.
 	t := q.Run(c)
 	for {
@@ -79,6 +79,9 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 			break
 		}
 		items = append(items, ap)
+	}
+	if len(items) == perPage {
+		hasNext = true
 	}
 	nextOffset := offsetParam + perPage
 	cursorKeyNext := cursorKey + strconv.Itoa(nextOffset)
