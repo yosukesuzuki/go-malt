@@ -235,15 +235,31 @@ casper.repeat(30, function() {
 //change offset value to match to perPage value in admin.go
 casper.thenOpen(baseURL + '/admin/form/#/adminpage/list', function() {
     this.test.assertHttpStatus(200);
-    this.test.assertEqual(this.exists('#nextButton'),true,'found next button');
+    this.test.assertExists('#nextButton', 'found next button');
     this.click('#nextButton');
-    this.test.assertEqual(this.getCurrentUrl(),baseURL + '/admin/form/#/adminpage/list/20','next button works')
+    this.test.assertEqual(this.getCurrentUrl(), baseURL + '/admin/form/#/adminpage/list/20', 'next button works')
 });
 
-casper.waitForSelector('#previousButton',function(){
-    this.test.assertEqual(this.exists('#nextButton'),false,'not found next button');
+casper.waitForSelector('#previousButton', function() {
+    this.test.assertEqual(this.exists('#nextButton'), false, 'not found next button');
     this.click('#previousButton');
-    this.test.assertEqual(this.getCurrentUrl(),baseURL + '/admin/form/#/adminpage/list','previous button works')
+    this.test.assertEqual(this.getCurrentUrl(), baseURL + '/admin/form/#/adminpage/list', 'previous button works')
+});
+
+casper.waitForSelector('tr td:first-child', function() {
+    this.mouseEvent('click', 'tr td:nth-child(4) button');
+
+});
+
+casper.setFilter('page.confirm', function(message) {
+    self.received = message;
+    this.echo("message to confirm : " + message);
+    return true;
+});
+
+casper.then(function(){
+    var lists = this.getElementsInfo('tbody tr');
+    this.test.assertEqual(lists.length,19,'list was reduced');
 });
 
 casper.run();
