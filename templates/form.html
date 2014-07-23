@@ -37,7 +37,7 @@
         <div class="form-group" v-repeat="items">
             <label class="col-sm-2 control-label" for="f_{{`{{frmName}}`}}">{{`{{frmTitle}}`}}</label>
             <div class="col-sm-10" v-if="frmType == 'string' && frmMaxLength <= 500">
-                <input type="text" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue">
+                <input type="text" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue" v-disable="frmName">
             </div>
             <div class="col-sm-10" v-if="frmType == 'integer'">
                 <input type="number" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue">

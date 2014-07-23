@@ -26,7 +26,14 @@ $.extend({
     }
 });
 
+
+
 $(document).ready(function() {
+    Vue.directive("disable", function(value) {
+            if ((value == "url")&&(this.el.value != "")) {
+                this.el.setAttribute("disabled", "disabled");
+            }
+    });
     Vue.filter('dateFormat', function(value) {
         return value.slice(0, 16)
     });
@@ -101,8 +108,8 @@ $(document).ready(function() {
                             methods: {
                                 deleteEntity: function(e) {
                                     console.log(e.targetVM);
-                                    if(window.confirm('Delete this entity?')){
-                                        $.del("/admin/rest/" + that.modelName + "/" + e.targetVM.$data.url,{},function(delResponse) {
+                                    if (window.confirm('Delete this entity?')) {
+                                        $.del("/admin/rest/" + that.modelName + "/" + e.targetVM.$data.url, {}, function(delResponse) {
                                             if (delResponse.message == "deleted") {
                                                 //location.href = "/admin/form/#/" + that.modelName + "/list/success";
                                                 //e.targetVM.$data;
