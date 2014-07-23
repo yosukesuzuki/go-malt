@@ -25,9 +25,6 @@ func executeJSON(w http.ResponseWriter, statusCode int, data map[string]interfac
 
 // handleAdminPage is REST handler of AdminPage struct.
 func handleAdminPage(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//modelName := vars["modelName"]
-	//var model = models[modelName]
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	switch r.Method {
@@ -40,12 +37,13 @@ func handleAdminPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getAdminPageList returns entity list of AdminPage model
 func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interface{} {
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
 	perPage := 20
-	cursorKey := "adminpage_cursor"
+	cursorKey := modelVar + "_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
 	if tmpOffsetValue != "" {
@@ -97,27 +95,76 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	return listDataSet
 }
 
-// handleArticlePage is REST handler of AdminPage struct.
-func handleArticlePage(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//modelName := vars["modelName"]
-	//var model = models[modelName]
+// handleAdminPage is REST handler of AdminPage struct.
+func handleArticle(w http.ResponseWriter, r *http.Request) {
 	modelVar := "article"
 	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
-		c := appengine.NewContext(r)
-		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
-		var items []Article
-		if _, err := q.GetAll(c, &items); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
+		listDataSet := getArticleList(w, r)
+		executeJSON(w, 200, listDataSet)
 	case "POST":
 		setNewEntity(w, r, modelVar)
 		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
+}
+
+// getAdminPageList returns entity list of AdminPage model
+func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	modelVar := "article"
+	modelName := modelNames[modelVar]
+	c := appengine.NewContext(r)
+	perPage := 20
+	cursorKey := modelVar + "_cursor"
+	tmpOffsetValue := r.FormValue("offset")
+	var offsetParam int
+	if tmpOffsetValue != "" {
+		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
+	} else {
+		offsetParam = 0
+	}
+	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
+	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
+	item, err := memcache.Get(c, cursorKeyCurrent)
+	if err == nil {
+		cursor, err := datastore.DecodeCursor(string(item.Value))
+		if err == nil {
+			q = q.Start(cursor)
+		}
+	}
+	var items ArticleList
+	var hasNext bool
+	hasNext = false
+	// Iterate over the results.
+	t := q.Run(c)
+	for {
+		var ap Article
+		_, err := t.Next(&ap)
+		if err == datastore.Done {
+			break
+		}
+		if err != nil {
+			c.Errorf("fetching next Article: %v", err)
+			hasNext = false
+			break
+		}
+		items = append(items, ap)
+	}
+	if len(items) == perPage {
+		hasNext = true
+	}
+	nextOffset := offsetParam + perPage
+	cursorKeyNext := cursorKey + strconv.Itoa(nextOffset)
+	// Get updated cursor and store it for next time.
+	if cursor, err := t.Cursor(); err == nil {
+		memcache.Set(c, &memcache.Item{
+			Key:   cursorKeyNext,
+			Value: []byte(cursor.String()),
+		})
+	}
+	listDataSet := map[string]interface{}{"items": items,
+		"has_next": hasNext, "next_offset": nextOffset, "per_page": perPage, "model_name": modelVar}
+	return listDataSet
 }
 
 // handleModelKeyName is REST handler of Model struct.

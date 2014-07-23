@@ -65,6 +65,9 @@ $(document).ready(function() {
                 if (typeof val.maxLength !== "undefined") {
                     tmpObject.frmMaxLength = val.maxLength;
                 }
+                if (typeof val.format !== "undefined") {
+                    tmpObject.frmFormat = val.format;
+                }
                 formElementArr.push(tmpObject)
             });
             formElementArr.sort(function(a, b) {
