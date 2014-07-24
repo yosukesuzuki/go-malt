@@ -257,9 +257,15 @@ casper.setFilter('page.confirm', function(message) {
     return true;
 });
 
+/*
+casper.wait(1000, function() {
+    this.echo("I've waited for a second.");
+});
+
 casper.then(function(){
     var lists = this.getElementsInfo('tbody tr');
     this.test.assertEqual(lists.length,19,'list was reduced');
 });
+*/
 
 casper.run();

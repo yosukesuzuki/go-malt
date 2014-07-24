@@ -19,10 +19,11 @@ import (
 var jsonSchemaTypes = map[string]string{"Boolean": "boolean", "String": "string", "Text": "string", "Integer": "integer", "DateTime": "string"}
 var jsonSchemaFields = map[string]string{"Text": "textarea"}
 var defaultValues = map[string]interface{}{"Boolean": false,
-	"String":   "",
-	"Text":     "",
-	"Integer":  0,
-	"DateTime": time.Now(),
+	"String":     "",
+	"Text":       "",
+	"Integer":    0,
+	"DateTime":   time.Now(),
+	"StringList": [...]string{""},
 }
 
 //Map for Models which can be used in restful API

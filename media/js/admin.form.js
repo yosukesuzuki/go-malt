@@ -29,12 +29,14 @@ $.extend({
 
 
 $(document).ready(function() {
+
     Vue.directive("disable", function(value) {
-            if ((value == "url")&&(this.el.value != "")) {
-                this.el.setAttribute("disabled", "disabled");
-            }
+        if ((value == "url") && (this.el.value != "")) {
+            this.el.setAttribute("disabled", "disabled");
+        }
     });
     Vue.filter('dateFormat', function(value) {
+        value = value.replace(/T/," ");
         return value.slice(0, 16)
     });
     var formApp = {};
@@ -160,6 +162,9 @@ $(document).ready(function() {
                             }
                         }
                     });
+                    $('.form-datetime').datetimepicker({
+                            format: "yyyy-mm-dd hh:ii"
+                    });
                     break;
                 case "update":
                     $.getJSON("/admin/rest/" + that.modelName + "/" + that.entityKey, function(data) {
@@ -198,10 +203,16 @@ $(document).ready(function() {
                                 }
                             }
                         });
+                        $('.form-datetime').datetimepicker({
+                            format: "yyyy-mm-dd hh:ii"
+                        });
                     });
             }
         });
+
+
     };
     formApp.drawForm();
+
     window.onhashchange = formApp.drawForm;
 });

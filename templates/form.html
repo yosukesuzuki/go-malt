@@ -6,6 +6,8 @@
     <div id="formContainer">
     </div>
 </div>
+<link href="/media/css/datetimepicker.css" rel="stylesheet">
+<script src="/media/js/bootstrap-datetimepicker.js"></script>
 <script src="/media/js/admin.form.js"></script>
 <script type="x-template" id="modelListTable">
     <p><a href="#/{{`{{modelName}}`}}/create" class="btn btn-primary" id="createEntity">Create new entity</a></p>
@@ -37,7 +39,7 @@
         <div class="form-group" v-repeat="items">
             <label class="col-sm-2 control-label" for="f_{{`{{frmName}}`}}">{{`{{frmTitle}}`}}</label>
             <div class="col-sm-10" v-if="frmFormat == 'date-time'">
-                <input type="text" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue" v-disable="frmName">
+                <input type="text" class="form-datetime" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue | dateFormat">
             </div>
             <div class="col-sm-10" v-if="frmType == 'string' && frmMaxLength <= 500 && !frmFormat">
                 <input type="text" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue" v-disable="frmName">
