@@ -268,4 +268,64 @@ casper.then(function(){
 });
 */
 
+// test of /admin/rest/schema/adminpage
+casper.thenOpen(baseURL + '/admin/rest/schema/article', function() {
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    //this.test.assertEqual(jsonData.fields.length,9,'total count of models should be 9');
+    //this.test.assertEqual(jsonData.model_name,'adminpage','title should be adminpage');
+});
+
+// add entity by post
+casper.thenOpen(baseURL + '/admin/rest/article', {
+    method: "post",
+    data: {
+        title: 'title1',
+        url: 'url1',
+        displaytime: '2014-07-25 12:00',
+        pageorder: 1,
+        content: 'foobar',
+        tagstring: 'tag',
+        displaypage: 'on',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(201);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
+});
+
+// add entity by post
+casper.thenOpen(baseURL + '/admin/rest/article', {
+    method: "post",
+    data: {
+        title: 'title0',
+        url: 'url0',
+        displaytime: '2014-07-25 12:01',
+        pageorder: 0,
+        content: 'foobar',
+        tagstring: 'tag0',
+        displaypage: '',
+    }
+}, function() {
+    this.echo("POST request has been sent.")
+    this.test.assertHttpStatus(201);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message, 'created', 'return created message');
+});
+
+casper.wait(1000, function() {
+    this.echo("I've waited for a second.");
+});
+
+casper.thenOpen(baseURL + '/admin/rest/article', function() {
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.items[0].displaypage, false, 'displaypage of the first entity should be false');
+    this.test.assertEqual(jsonData.items[0].title, 'title0', 'title of the first entity should be title0');
+    this.test.assertEqual(jsonData.items[0].url, 'url0', 'url of the first entity should be url0');
+    this.test.assertEqual(jsonData.items[0].pageorder, 0, 'content of the first entity should be 0');
+    this.test.assertEqual(jsonData.items[0].content, 'foobar', 'title of the first entity should be foobar');
+    this.test.assertEqual(jsonData.items[0].displaytime.replace('T'," ").slice(0,16), '2014-07-25 12:01', 'title of the first entity should be foobar');
+});
 casper.run();
