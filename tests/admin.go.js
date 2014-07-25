@@ -328,4 +328,116 @@ casper.thenOpen(baseURL + '/admin/rest/article', function() {
     this.test.assertEqual(jsonData.items[0].content, 'foobar', 'title of the first entity should be foobar');
     this.test.assertEqual(jsonData.items[0].displaytime.replace('T'," ").slice(0,16), '2014-07-25 12:01', 'title of the first entity should be foobar');
 });
+
+casper.thenOpen(baseURL + '/admin/rest/article/url0', {
+    method: "delete",
+}, function() {
+    this.echo("DELETE request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message, 'deleted', 'return deleted message');
+});
+
+casper.thenOpen(baseURL + '/admin/rest/article/url1', {
+    method: "delete",
+}, function() {
+    this.echo("DELETE request has been sent.")
+    this.test.assertHttpStatus(200);
+    var jsonData = JSON.parse(this.getPageContent());
+    this.test.assertEqual(jsonData.message, 'deleted', 'return deleted message');
+});
+
+casper.thenOpen(baseURL + '/admin/form/#/article/list', function() {
+    this.test.assertHttpStatus(200);
+});
+
+casper.waitForSelector('tr td:first-child', function() {
+    var tempArr = this.getElementsInfo('tr td:first-child');
+    this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
+});
+
+casper.then(function() {
+    this.click('#createEntity');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.fill('form.form-horizontal', {
+        'displaypage': true,
+        'title': 'title999',
+        'url': 'url999',
+        'displaytime': '2014-07-25 12:01',
+        'pageorder': 999,
+        'content': 'content999',
+        'tagstring': 'tag0',
+        'externalurl': 'link999',
+    }, true)
+});
+
+casper.waitForSelector('tr td:first-child', function() {
+    var tempArr = this.getElementsInfo('tr td:first-child');
+    this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
+    this.mouseEvent('click', 'tr td:nth-child(3) a:first-child');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.fill('form.form-horizontal', {
+        'displaypage': false,
+    }, true);
+})
+
+casper.waitForSelector('tr td:first-child', function() {
+    this.mouseEvent('click', 'tr td:nth-child(3) a:first-child');
+});
+
+casper.waitForSelector('form.form-horizontal', function() {
+    this.test.assertEqual(false, this.getFormValues('form.form-horizontal').displaypage, 'check data update');
+})
+
+var j = 0;
+casper.repeat(30, function() {
+    j++;
+    this.thenOpen(baseURL + '/admin/rest/article', {
+        method: "post",
+        data: {
+            title: 'title' + j,
+            url: 'url' + j,
+            displaytime: '2014-07-25 12:01',
+            pageorder: j,
+            content: 'foobar',
+            tagstring: 'tag'+j,
+            displaypage: 'on',
+        }
+    }, function() {
+        this.echo("POST request has been sent.")
+        this.test.assertHttpStatus(201);
+        var jsonData = JSON.parse(this.getPageContent());
+        this.test.assertEqual(jsonData.message, 'created', 'return created message');
+    });
+});
+
+//change offset value to match to perPage value in admin.go
+casper.thenOpen(baseURL + '/admin/form/#/article/list', function() {
+    this.test.assertHttpStatus(200);
+    this.test.assertExists('#nextButton', 'found next button');
+    this.click('#nextButton');
+    this.test.assertEqual(this.getCurrentUrl(), baseURL + '/admin/form/#/article/list/20', 'next button works')
+});
+
+casper.waitForSelector('#previousButton', function() {
+    this.test.assertEqual(this.exists('#nextButton'), false, 'not found next button');
+    this.click('#previousButton');
+    this.test.assertEqual(this.getCurrentUrl(), baseURL + '/admin/form/#/article/list', 'previous button works')
+});
+
+casper.waitForSelector('tr td:first-child', function() {
+    this.mouseEvent('click', 'tr td:nth-child(4) button');
+
+});
+
+casper.setFilter('page.confirm', function(message) {
+    self.received = message;
+    this.echo("message to confirm : " + message);
+    return true;
+});
+
 casper.run();

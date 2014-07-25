@@ -276,9 +276,9 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	}
 	key := datastore.NewKey(c, modelName, keyName, 0, nil)
 	for i := 0; i < s.NumField(); i++ {
-		log.Println(typeOfT.Field(i).Name)
-		log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
-		log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		//log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
+		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 		if typeOfT.Field(i).Tag.Get("verbose_name") == "-" {
 			setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
 			if setDefaultErr != nil {
@@ -364,9 +364,9 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		return
 	}
 	for i := 0; i < s.NumField(); i++ {
-		log.Println(typeOfT.Field(i).Name)
-		log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
-		log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		//log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
+		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
 		case "Boolean":
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
