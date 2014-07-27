@@ -385,6 +385,18 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				}
 			}
 		case "DateTime":
+			if typeOfT.Field(i).Tag.Get("json") == "update" {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
+					return
+				}
+				continue
+			}
+			if typeOfT.Field(i).Tag.Get("json") == "created" {
+				log.Println("skipped")
+				continue
+			}
 			date_yyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, date_yyyymmddhhmm)
 			if err != nil {
@@ -393,17 +405,6 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-			}
-			if typeOfT.Field(i).Tag.Get("json") == "update" {
-				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
-				if setDefaultErr != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				continue
-			} else if typeOfT.Field(i).Tag.Get("json") == "created" {
-				log.Println("skipped")
-				continue
 			}
 		default:
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))

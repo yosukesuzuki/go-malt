@@ -26,7 +26,20 @@ $.extend({
     }
 });
 
-
+//todo; temporally fix for datepicker and vuejs causes empty value.
+function setPostData(arrayObj){
+    var postData = {};
+    $.each(arrayObj, function(i, val) {
+        if (val.frmValue == true) {
+            postData[val.frmName] = "on";
+        }else if((typeof val.frmFormat !== "undefined")&&(val.frmFormat=="date-time")){
+            postData[val.frmName] = $("#f_"+val.frmName).val();
+        } else {
+            postData[val.frmName] = val.frmValue;
+        }
+    });
+    return postData;
+}
 
 $(document).ready(function() {
 
@@ -141,14 +154,7 @@ $(document).ready(function() {
                             submitUpdate: function(e) {
                                 e.preventDefault();
                                 console.log(this.$data);
-                                postData = {}
-                                $.each(this.$data.items, function(i, val) {
-                                    if (val.frmValue == true) {
-                                        postData[val.frmName] = "on";
-                                    } else {
-                                        postData[val.frmName] = val.frmValue;
-                                    }
-                                });
+                                postData = setPostData(this.$data.items); 
                                 $.post("/admin/rest/" + that.modelName, postData, function(data) {
                                     if (data.message == "created") {
                                         location.href = "/admin/form/#/" + that.modelName + "/list";
@@ -182,14 +188,7 @@ $(document).ready(function() {
                                 submitUpdate: function(e) {
                                     e.preventDefault();
                                     console.log(this.$data);
-                                    putData = {}
-                                    $.each(this.$data.items, function(i, val) {
-                                        if (val.frmValue == true) {
-                                            putData[val.frmName] = "on";
-                                        } else {
-                                            putData[val.frmName] = val.frmValue;
-                                        }
-                                    });
+                                    putData = setPostData(this.$data.items); 
                                     $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
                                         if (putResponse.message == "updated") {
                                             location.href = "/admin/form/#/" + that.modelName + "/list/success";
