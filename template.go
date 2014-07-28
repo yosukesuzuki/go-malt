@@ -175,6 +175,8 @@ func GetFbAppID() string {
 var tpls = map[string]*template.Template{
 	"404":          newTemplate("templates/base.html", "templates/404.html"),
 	"index":        newTemplate("templates/base.html", "templates/index.html"),
+	"adminIndex":   newTemplate("templates/admin_base.html", "templates/admin_index.html"),
+	"form":         newTemplate("templates/admin_base.html", "templates/form.html"),
 	"page":         newTemplate("templates/base.html", "templates/page.html"),
 	"articleIndex": newTemplate("templates/base.html", "templates/article_index.html"),
 }

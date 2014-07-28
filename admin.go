@@ -3,6 +3,7 @@ package main
 import (
 	"appengine"
 	"appengine/datastore"
+	"appengine/memcache"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/oleiade/reflections"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,29 +25,149 @@ func executeJSON(w http.ResponseWriter, statusCode int, data map[string]interfac
 
 // handleAdminPage is REST handler of AdminPage struct.
 func handleAdminPage(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//modelName := vars["modelName"]
-	//var model = models[modelName]
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	switch r.Method {
 	case "GET":
-		c := appengine.NewContext(r)
-		q := datastore.NewQuery(modelName).Order("-update").Limit(20)
-		//items := modelLists[modelVar]
-		var items []AdminPage
-		if _, err := q.GetAll(c, &items); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "items": items})
+		listDataSet := getAdminPageList(w, r)
+		executeJSON(w, 200, listDataSet)
 	case "POST":
 		setNewEntity(w, r, modelVar)
 		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
 	}
 }
 
+// getAdminPageList returns entity list of AdminPage model
+func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	modelVar := "adminpage"
+	modelName := modelNames[modelVar]
+	c := appengine.NewContext(r)
+	perPage := 20
+	cursorKey := modelVar + "_cursor"
+	tmpOffsetValue := r.FormValue("offset")
+	var offsetParam int
+	if tmpOffsetValue != "" {
+		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
+	} else {
+		offsetParam = 0
+	}
+	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
+	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
+	item, err := memcache.Get(c, cursorKeyCurrent)
+	if err == nil {
+		cursor, err := datastore.DecodeCursor(string(item.Value))
+		if err == nil {
+			q = q.Start(cursor)
+		}
+	}
+	var items AdminPageList
+	var hasNext bool
+	hasNext = false
+	// Iterate over the results.
+	t := q.Run(c)
+	for {
+		var ap AdminPage
+		_, err := t.Next(&ap)
+		if err == datastore.Done {
+			break
+		}
+		if err != nil {
+			c.Errorf("fetching next AdminPage: %v", err)
+			hasNext = false
+			break
+		}
+		items = append(items, ap)
+	}
+	if len(items) == perPage {
+		hasNext = true
+	}
+	nextOffset := offsetParam + perPage
+	cursorKeyNext := cursorKey + strconv.Itoa(nextOffset)
+	// Get updated cursor and store it for next time.
+	if cursor, err := t.Cursor(); err == nil {
+		memcache.Set(c, &memcache.Item{
+			Key:   cursorKeyNext,
+			Value: []byte(cursor.String()),
+		})
+	}
+	listDataSet := map[string]interface{}{"items": items,
+		"has_next": hasNext, "next_offset": nextOffset, "per_page": perPage, "model_name": modelVar}
+	return listDataSet
+}
+
 // handleAdminPage is REST handler of AdminPage struct.
+func handleArticle(w http.ResponseWriter, r *http.Request) {
+	modelVar := "article"
+	modelName := modelNames[modelVar]
+	switch r.Method {
+	case "GET":
+		listDataSet := getArticleList(w, r)
+		executeJSON(w, 200, listDataSet)
+	case "POST":
+		setNewEntity(w, r, modelVar)
+		executeJSON(w, 201, map[string]interface{}{"model_name": modelName, "message": "created"})
+	}
+}
+
+// getAdminPageList returns entity list of AdminPage model
+func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	modelVar := "article"
+	modelName := modelNames[modelVar]
+	c := appengine.NewContext(r)
+	perPage := 20
+	cursorKey := modelVar + "_cursor"
+	tmpOffsetValue := r.FormValue("offset")
+	var offsetParam int
+	if tmpOffsetValue != "" {
+		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
+	} else {
+		offsetParam = 0
+	}
+	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
+	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
+	item, err := memcache.Get(c, cursorKeyCurrent)
+	if err == nil {
+		cursor, err := datastore.DecodeCursor(string(item.Value))
+		if err == nil {
+			q = q.Start(cursor)
+		}
+	}
+	var items ArticleList
+	var hasNext bool
+	hasNext = false
+	// Iterate over the results.
+	t := q.Run(c)
+	for {
+		var ap Article
+		_, err := t.Next(&ap)
+		if err == datastore.Done {
+			break
+		}
+		if err != nil {
+			c.Errorf("fetching next Article: %v", err)
+			hasNext = false
+			break
+		}
+		items = append(items, ap)
+	}
+	if len(items) == perPage {
+		hasNext = true
+	}
+	nextOffset := offsetParam + perPage
+	cursorKeyNext := cursorKey + strconv.Itoa(nextOffset)
+	// Get updated cursor and store it for next time.
+	if cursor, err := t.Cursor(); err == nil {
+		memcache.Set(c, &memcache.Item{
+			Key:   cursorKeyNext,
+			Value: []byte(cursor.String()),
+		})
+	}
+	listDataSet := map[string]interface{}{"items": items,
+		"has_next": hasNext, "next_offset": nextOffset, "per_page": perPage, "model_name": modelVar}
+	return listDataSet
+}
+
+// handleModelKeyName is REST handler of Model struct.
 func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	keyName := vars["keyName"]
@@ -82,14 +204,24 @@ func adminIndex(w http.ResponseWriter, r *http.Request) error {
 		"description": "this is a starter app for GAE/Go",
 		"body":        "admin page",
 	}
-	return executeTemplate(w, "index", 200, data)
+	return executeTemplate(w, "adminIndex", 200, data)
+}
+
+// adminIndex renders index page for admin
+func adminForm(w http.ResponseWriter, r *http.Request) error {
+	data := map[string]interface{}{
+		"title":       "admin form",
+		"description": "this is a starter app for GAE/Go",
+		"body":        "admin form",
+	}
+	return executeTemplate(w, "form", 200, data)
 }
 
 // adminModels returns list of models
 func adminModels(w http.ResponseWriter, r *http.Request) {
-	var itemList []string
+	var itemList []map[string]string
 	for k := range models {
-		itemList = append(itemList, k)
+		itemList = append(itemList, map[string]string{"name": modelNames[k], "description": modelDescriptions[k], "id": k})
 	}
 	executeJSON(w, 200, map[string]interface{}{"models": itemList})
 }
@@ -99,14 +231,36 @@ func modelMetaData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	modelVar := vars["modelVar"]
 	var model = models[modelVar]
-	var itemList []ModelField
+	modelName := modelNames[modelVar]
+	schema := map[string]interface{}{"type": "object", "title": modelName}
+	var properties map[string]interface{}
+	properties = make(map[string]interface{})
+	var requiredProperties []string
 	s := reflect.ValueOf(model).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
-		modelField := ModelField{typeOfT.Field(i).Tag.Get("json"), typeOfT.Field(i).Tag.Get("datastore_type"), typeOfT.Field(i).Tag.Get("verbose_name")}
-		itemList = append(itemList, modelField)
+		if typeOfT.Field(i).Tag.Get("verbose_name") != "-" {
+			jsonSchemaType := jsonSchemaTypes[typeOfT.Field(i).Tag.Get("datastore_type")]
+			property := map[string]interface{}{
+				"type":       jsonSchemaType,
+				"title":      typeOfT.Field(i).Tag.Get("verbose_name"),
+				"fieldOrder": i,
+			}
+			switch typeOfT.Field(i).Tag.Get("datastore_type") {
+			case "String":
+				property["maxLength"] = 500
+			case "DateTime":
+				property["format"] = "date-time"
+			}
+			properties[typeOfT.Field(i).Tag.Get("json")] = property
+			if strings.Contains(typeOfT.Field(i).Tag.Get("datastore"), "required") {
+				requiredProperties = append(requiredProperties, typeOfT.Field(i).Tag.Get("json"))
+			}
+		}
 	}
-	executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "fields": itemList})
+	schema["properties"] = properties
+	schema["required"] = requiredProperties
+	executeJSON(w, 200, map[string]interface{}{"schema": schema})
 }
 
 // setNewEntity put a new entity to datastore which is sent in FormValue
@@ -125,13 +279,23 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		//log.Println(typeOfT.Field(i).Name)
 		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
 		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
-		if typeOfT.Field(i).Tag.Get("datastore_type") == "Boolean" {
+		if typeOfT.Field(i).Tag.Get("verbose_name") == "-" {
+			setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+			if setDefaultErr != nil {
+				continue
+				//http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
+				//return
+			}
+			continue
+		}
+		switch typeOfT.Field(i).Tag.Get("datastore_type") {
+		case "Boolean":
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-		} else if typeOfT.Field(i).Tag.Get("datastore_type") == "Integer" {
+		case "Integer":
 			tmpStringInt, _ := strconv.Atoi(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, tmpStringInt)
 			if err != nil {
@@ -141,7 +305,25 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 					return
 				}
 			}
-		} else {
+		case "DateTime":
+			if r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "" {
+				err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				continue
+			}
+			date_yyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, date_yyyymmddhhmm)
+			if err != nil {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+		default:
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 			if err != nil {
 				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
@@ -151,10 +333,17 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				}
 			}
 		}
-
 	}
-	_, err := datastore.Put(c, key, modelStruct)
-	if err != nil {
+	urlValue, err := reflections.GetField(modelStruct, "URL")
+	if urlValue == "" {
+		setUrlErr := reflections.SetField(modelStruct, "URL", keyName)
+		if setUrlErr != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	_, putErr := datastore.Put(c, key, modelStruct)
+	if putErr != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -178,13 +367,14 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		//log.Println(typeOfT.Field(i).Name)
 		//log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
 		//log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
-		if typeOfT.Field(i).Tag.Get("datastore_type") == "Boolean" {
+		switch typeOfT.Field(i).Tag.Get("datastore_type") {
+		case "Boolean":
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-		} else if typeOfT.Field(i).Tag.Get("datastore_type") == "Integer" {
+		case "Integer":
 			tmpStringInt, _ := strconv.Atoi(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, tmpStringInt)
 			if err != nil {
@@ -194,25 +384,39 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 					return
 				}
 			}
-		} else {
-			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		case "DateTime":
+			if typeOfT.Field(i).Tag.Get("json") == "update" {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
+					return
+				}
+				continue
+			}
+			if typeOfT.Field(i).Tag.Get("json") == "created" {
+				log.Println("skipped")
+				continue
+			}
+			date_yyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, date_yyyymmddhhmm)
 			if err != nil {
-				if typeOfT.Field(i).Tag.Get("json") == "update" {
-					setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
-					if setDefaultErr != nil {
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
-					}
-				} else if typeOfT.Field(i).Tag.Get("json") == "created" {
-					log.Println("skipped")
-					continue
-				} else {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, time.Now())
+				if setDefaultErr != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
 			}
+		default:
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			if err != nil {
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					//http.Error(w, err.Error(), http.StatusInternalServerError)
+					//return
+					continue
+				}
+			}
 		}
-
 	}
 	_, putErr := datastore.Put(c, key, modelStruct)
 	if putErr != nil {

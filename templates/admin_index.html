@@ -1,0 +1,22 @@
+{{ define "content"}}
+<!-- Main component for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <h1>
+            {{ .body }}
+        </h1>
+    </div>
+</div>
+<div class="container">
+    <div class="row" id="models">
+        <div class="col-md-4" v-repeat="models">
+            <h2>{{`{{name}}`}}</h2>
+            <p>
+            {{`{{description}}`}}
+            </p>
+            <p><a class="btn btn-default" href="/admin/form/#/{{`{{id}}`}}/list">Go&raquo;</a></p>
+        </div>
+    </div>
+</div>
+<script src="/media/js/admin.index.js"></script>
+{{end}}
