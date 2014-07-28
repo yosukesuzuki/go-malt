@@ -370,12 +370,23 @@ casper.waitForSelector('form.form-horizontal', function() {
         'content': 'content999',
         'tagstring': 'tag0',
         'externalurl': 'link999',
-    }, true)
+    },false);
+    this.mouseEvent('click', '#submitButton');
+});
+
+/*
+casper.thenEvaluate(function(){
+    var esc = $.Event("keydown", { keyCode: 27 });
+    $("body").trigger(esc);
 });
 
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
     this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
+    this.capture('debug.jpg', undefined, {
+        format: 'jpg',
+        quality: 75
+    });
     this.mouseEvent('click', 'tr td:nth-child(3) a:first-child');
 });
 
@@ -392,6 +403,7 @@ casper.waitForSelector('tr td:first-child', function() {
 casper.waitForSelector('form.form-horizontal', function() {
     this.test.assertEqual(false, this.getFormValues('form.form-horizontal').displaypage, 'check data update');
 })
+*/
 
 var j = 0;
 casper.repeat(30, function() {
