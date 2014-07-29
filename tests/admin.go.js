@@ -351,10 +351,12 @@ casper.thenOpen(baseURL + '/admin/form/#/article/list', function() {
     this.test.assertHttpStatus(200);
 });
 
+/*
 casper.waitForSelector('tr td:first-child', function() {
     var tempArr = this.getElementsInfo('tr td:first-child');
     this.test.assertEqual(tempArr.length !== 0, true, 'check table list');
 });
+*/
 
 casper.then(function() {
     this.click('#createEntity');
