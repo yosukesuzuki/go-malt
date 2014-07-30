@@ -25,7 +25,7 @@ before_script:
     - goapp serve &
     - sleep 5
 script:
-    - casperjs test tests/admin.go.js
+    - casperjs test tests/admin.go.coffee
 after_success:
     - python $GAE/appcfg.py update . --oauth2_refresh_token=$GAE_OAUTH -A dev-goappstarter 
 env:
