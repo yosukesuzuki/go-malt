@@ -42,3 +42,27 @@ html templates
 
 ## /media
 static files
+
+# Libraries
+## go
+### gorilla/mux
+http://www.gorillatoolkit.org/pkg/mux
+
+### gorilla/site
+https://github.com/gorilla/site
+
+## Reflections
+https://github.com/oleiade/reflections
+
+## js/css
+### bootstrap
+http://getbootstrap.com/
+
+### bootstrap-datetimepicker.js
+by Stefan Petre
+
+### Vue.js
+http://vuejs.org/
+
+### marked
+https://github.com/chjj/marked
