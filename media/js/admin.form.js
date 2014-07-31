@@ -41,6 +41,12 @@ function setPostData(arrayObj){
     return postData;
 }
 
+function setFormUtils(){
+    $('.form-datetime').datetimepicker({
+        format: "yyyy-mm-dd hh:ii"
+    });
+}
+
 $(document).ready(function() {
 
     Vue.directive("disable", function(value) {
@@ -150,6 +156,9 @@ $(document).ready(function() {
                         data: {
                             items: formElementArr,
                         },
+                        filters: {
+                            marked: marked
+                        },
                         methods: {
                             submitUpdate: function(e) {
                                 e.preventDefault();
@@ -168,9 +177,10 @@ $(document).ready(function() {
                             }
                         }
                     });
-                    $('.form-datetime').datetimepicker({
-                            format: "yyyy-mm-dd hh:ii"
-                    });
+                    // $('.form-datetime').datetimepicker({
+                    //         format: "yyyy-mm-dd hh:ii"
+                    // });
+                    setFormUtils();
                     break;
                 case "update":
                     $.getJSON("/admin/rest/" + that.modelName + "/" + that.entityKey, function(data) {
@@ -183,6 +193,9 @@ $(document).ready(function() {
                             template: "#modelForm",
                             data: {
                                 items: formElementArr,
+                            },
+                            filters: {
+                                marked: marked
                             },
                             methods: {
                                 submitUpdate: function(e) {
@@ -202,9 +215,10 @@ $(document).ready(function() {
                                 }
                             }
                         });
-                        $('.form-datetime').datetimepicker({
-                            format: "yyyy-mm-dd hh:ii"
-                        });
+                        setFormUtils();
+                        // $('.form-datetime').datetimepicker({
+                        //     format: "yyyy-mm-dd hh:ii"
+                        // });
                     });
             }
         });
