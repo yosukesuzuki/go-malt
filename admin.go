@@ -2,7 +2,9 @@ package main
 
 import (
 	"appengine"
+	"appengine/blobstore"
 	"appengine/datastore"
+	"appengine/image"
 	"appengine/memcache"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -423,4 +425,49 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		http.Error(w, putErr.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func imageUploadUrl(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	uploadURL, err := blobstore.UploadURL(c, "/admin/image/upload/handler", nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	executeJSON(w, 200, map[string]interface{}{"uploadurl": uploadURL.Path})
+}
+
+func handleImageUpload(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	blobs, _, err := blobstore.ParseUpload(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	file := blobs["file"]
+	if len(file) == 0 {
+		c.Errorf("no file uploaded")
+		executeJSON(w, 200, map[string]interface{}{"message": "no file uploaded"})
+		return
+	}
+	var imageOptions image.ServingURLOptions
+	imageUrl, urlErr := image.ServingURL(c, file[0].BlobKey, &imageOptions)
+	if urlErr != nil {
+		http.Error(w, urlErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	modelName := "BlobStoreImage"
+	modelStruct := &BlobStoreImage{}
+	key := datastore.NewKey(c, modelName, string(file[0].BlobKey), 0, nil)
+	setErr := reflections.SetField(modelStruct, "ImageUrl", imageUrl)
+	if setErr != nil {
+		http.Error(w, setErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, putErr := datastore.Put(c, key, modelStruct)
+	if putErr != nil {
+		http.Error(w, putErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	executeJSON(w, 201, map[string]interface{}{"message": "created", "image_url": imageUrl})
 }

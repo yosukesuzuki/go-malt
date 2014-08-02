@@ -322,4 +322,8 @@ casper.setFilter "page.confirm", (message) ->
   @echo "message to confirm : " + message
   true
 
+casper.thenOpen baseURL + "/admin/image/upload/url", ->
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+
 casper.run()
