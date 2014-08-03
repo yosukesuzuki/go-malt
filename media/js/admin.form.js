@@ -61,11 +61,20 @@ function setFormUtils(){
             errorText: "Error uploading file",
             extraParams: {},
             extraHeaders: {},
-            onReceivedFile: function(file) {},
-            onUploadedFile: function(json) {},
+            onReceivedFile: function(file) {
+            },
+            onUploadedFile: function(json) {
+            },
             customErrorHandler: function() { return true; },
             customUploadHandler: function(file) { return true; },
-            dataProcessor: function(data) { return data; }
+            dataProcessor: function(data) {
+                //refresh upload url on uploaded
+                var that = this;
+                $.getJSON("/admin/image/upload/url",function(refreshData){
+                    that.uploadUrl = refreshData.uploadurl;
+                });
+                return data; 
+            }
         };
         $('textarea').inlineattach(options);
     });
