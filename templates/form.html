@@ -7,7 +7,49 @@
     </div>
 </div>
 <link href="/media/css/datetimepicker.css" rel="stylesheet">
+<style>
+div.editor {
+    margin: 0;
+    height: 100%;
+    color: #333;
+    }
+textarea, div.editor div {
+    display: inline-block;
+    width: 49%;
+    height: 100%;
+    max-height:500px;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 20px 20px;
+    overflow: scroll; 
+}
+
+div.editor div img {
+    max-width:100%;
+}
+
+textarea {
+    border: none;
+    min-height:440px;
+    border-right: 1px solid #ccc;
+    resize: none;
+    outline: none;
+    background-color: #f6f6f6;
+    font-size: 14px;
+    font-family: 'Monaco', courier, monospace;
+    padding: 20px;
+}
+
+code {
+    color: #f66;
+}
+</style>
 <script src="/media/js/bootstrap-datetimepicker.js"></script>
+<script src="/media/js/marked.min.js"></script>
+<script src="/media/js/inline-attach.min.js"></script>
+<script src="/media/js/jquery.inline-attach.min.js"></script>
 <script src="/media/js/admin.form.js"></script>
 <script type="x-template" id="modelListTable">
     <p><a href="#/{{`{{modelName}}`}}/create" class="btn btn-primary" id="createEntity">Create new entity</a></p>
@@ -50,8 +92,9 @@
             <div class="col-sm-10" v-if="frmType == 'boolean'">
                 <input type="checkbox" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue">
             </div>
-            <div class="col-sm-10" v-if="frmType == 'string' && !frmMaxLength && !frmFormat">
-                <textarea class="form-control" rows="3" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue"></textarea>
+            <div class="col-sm-10 editor" v-if="frmType == 'string' && !frmMaxLength && !frmFormat">
+                <textarea name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue"></textarea>
+                <div v-html="frmValue | marked"></div>
             </div>
         </div>
         <div class="form-group">

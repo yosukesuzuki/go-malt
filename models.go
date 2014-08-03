@@ -58,7 +58,7 @@ type Article struct {
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
-	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"Text" verbose_name:"TagString"`
+	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
 	Tags        []string  `datastore:"tags" json:"tags" datastore_type:"StringList" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
@@ -66,3 +66,12 @@ type Article struct {
 }
 
 type ArticleList []Article
+
+type BlobStoreImage struct {
+	Title    string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`
+	Note     string    `datastore:"note,noindex" json:"content" datastore_type:"Text" verbose_name:"Description"`
+	BlobKey  string    `datastore:"blob_key" json:"tagstring" datastore_type:"String" verbose_name:"Blobkey"`
+	ImageUrl string    `datastore:"image_url" json:"image_url" datastore_type:"String" verbose_name:"Image Url"`
+	Update   time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
+	Create   time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+}

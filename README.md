@@ -3,6 +3,17 @@ gae-go-starter
 
 web application starter template for GAE/go
 
+What is this?
+
+- Starter template for Google App Engine Go
+- CMS included 
+- Easy to deploy
+    - just type "goapp deploy"
+- Auto scaling
+    - AppEngine does it automatically
+    - go runtime spin up is faster than python and java
+- Responsive template
+
 #set up
 ##1. install go
 if you use Mac OS, "brew install go" is the easiest way.
@@ -42,3 +53,30 @@ html templates
 
 ## /media
 static files
+
+# Libraries
+## go
+### gorilla/mux
+http://www.gorillatoolkit.org/pkg/mux
+
+### gorilla/site
+https://github.com/gorilla/site
+
+## Reflections
+https://github.com/oleiade/reflections
+
+## js/css
+### bootstrap
+http://getbootstrap.com/
+
+### bootstrap-datetimepicker.js
+by Stefan Petre
+
+### Vue.js
+http://vuejs.org/
+
+### marked
+https://github.com/chjj/marked
+
+### Inline Attachment
+https://github.com/Rovak/InlineAttachment
