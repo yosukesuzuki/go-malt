@@ -24,6 +24,10 @@ textarea, div.editor div {
     padding: 20px 20px;
 }
 
+div.editor div img {
+    max-width:100%;
+}
+
 textarea {
     border: none;
     min-height:440px;
@@ -42,6 +46,8 @@ code {
 </style>
 <script src="/media/js/bootstrap-datetimepicker.js"></script>
 <script src="/media/js/marked.min.js"></script>
+<script src="/media/js/inline-attach.min.js"></script>
+<script src="/media/js/jquery.inline-attach.min.js"></script>
 <script src="/media/js/admin.form.js"></script>
 <script type="x-template" id="modelListTable">
     <p><a href="#/{{`{{modelName}}`}}/create" class="btn btn-primary" id="createEntity">Create new entity</a></p>

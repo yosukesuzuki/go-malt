@@ -30,7 +30,7 @@ $.extend({
 function setPostData(arrayObj){
     var postData = {};
     $.each(arrayObj, function(i, val) {
-        if (val.frmValue == true) {
+        if (val.frmValue === true) {
             postData[val.frmName] = "on";
         }else if((typeof val.frmFormat !== "undefined")&&(val.frmFormat=="date-time")){
             postData[val.frmName] = $("#f_"+val.frmName).val();
@@ -40,23 +40,48 @@ function setPostData(arrayObj){
     });
     return postData;
 }
-
 function setFormUtils(){
     $('.form-datetime').datetimepicker({
         format: "yyyy-mm-dd hh:ii"
     });
+    $.getJSON("/admin/image/upload/url",function(data){
+        var uploadUrl = data.uploadurl;
+        var options ={
+            uploadUrl: uploadUrl,
+            uploadFieldName: 'file',
+            downloadFieldName: 'filename',
+            allowedTypes: [
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+                'image/gif'
+            ],
+            progressText: '![Uploading file...]()',
+            urlText: "![file]({filename})",
+            errorText: "Error uploading file",
+            extraParams: {},
+            extraHeaders: {},
+            onReceivedFile: function(file) {},
+            onUploadedFile: function(json) {},
+            customErrorHandler: function() { return true; },
+            customUploadHandler: function(file) { return true; },
+            dataProcessor: function(data) { return data; }
+        };
+        $('textarea').inlineattach(options);
+    });
+
 }
 
 $(document).ready(function() {
 
     Vue.directive("disable", function(value) {
-        if ((value == "url") && (this.el.value != "")) {
+        if ((value == "url") && (this.el.value !== "")) {
             this.el.setAttribute("disabled", "disabled");
         }
     });
     Vue.filter('dateFormat', function(value) {
         value = value.replace(/T/," ");
-        return value.slice(0, 16)
+        return value.slice(0, 16);
     });
     var formApp = {};
     formApp.drawForm = function() {
@@ -89,7 +114,7 @@ $(document).ready(function() {
                 if (typeof val.format !== "undefined") {
                     tmpObject.frmFormat = val.format;
                 }
-                formElementArr.push(tmpObject)
+                formElementArr.push(tmpObject);
             });
             formElementArr.sort(function(a, b) {
                 var x = a.frmFieldOrder;
@@ -105,7 +130,7 @@ $(document).ready(function() {
                     var offset = parseInt(that.entityKey);
                     var requestUrl = "/admin/rest/" + that.modelName;
                     if (!isNaN(offset)) {
-                        requestUrl += "?offset=" + offset
+                        requestUrl += "?offset=" + offset;
                     }
                     $.getJSON(requestUrl, function(listData) {
                         var nextPage = false;
@@ -114,7 +139,7 @@ $(document).ready(function() {
                             nextPage = "/admin/form/#/" + that.modelName + "/list/" + listData.next_offset;
                         }
                         if (!isNaN(offset)) {
-                            if (offset - listData.per_page != 0) {
+                            if (offset - listData.per_page !== 0) {
                                 previousPage = "/admin/form/#/" + that.modelName + "/list/" + (offset - listData.per_page);
                             } else {
                                 previousPage = "/admin/form/#/" + that.modelName + "/list";

@@ -80,3 +80,6 @@ http://vuejs.org/
 
 ### marked
 https://github.com/chjj/marked
+
+### Inline Attachment
+https://github.com/Rovak/InlineAttachment

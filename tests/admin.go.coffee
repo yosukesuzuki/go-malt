@@ -325,5 +325,6 @@ casper.setFilter "page.confirm", (message) ->
 casper.thenOpen baseURL + "/admin/image/upload/url", ->
   @test.assertHttpStatus 200
   jsonData = JSON.parse(@getPageContent())
+  @test.assertMatch jsonData.uploadurl,/^\/_ah\/upload/,"test upload url"
 
 casper.run()
