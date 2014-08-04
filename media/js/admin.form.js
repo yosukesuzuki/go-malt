@@ -57,7 +57,7 @@ function setFormUtils(){
                 'image/gif'
             ],
             progressText: '![Uploading file...]()',
-            urlText: "![file]({filename})",
+            urlText: "![file]({filename})\n\n",
             errorText: "Error uploading file",
             extraParams: {},
             extraHeaders: {},
