@@ -44,7 +44,7 @@ type AdminPage struct {
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
-	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
 type AdminPageList []AdminPage
@@ -62,7 +62,7 @@ type Article struct {
 	Tags        []string  `datastore:"tags" json:"tags" datastore_type:"StringList" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
-	Create      time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
 type ArticleList []Article
@@ -73,5 +73,5 @@ type BlobStoreImage struct {
 	BlobKey  string    `datastore:"blob_key" json:"tagstring" datastore_type:"String" verbose_name:"Blobkey"`
 	ImageUrl string    `datastore:"image_url" json:"image_url" datastore_type:"String" verbose_name:"Image Url"`
 	Update   time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
-	Create   time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+	Created  time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }

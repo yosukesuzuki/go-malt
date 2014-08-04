@@ -457,25 +457,10 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	modelName := "BlobStoreImage"
-	modelStruct := &BlobStoreImage{}
 	key := datastore.NewKey(c, modelName, string(file[0].BlobKey), 0, nil)
 	imageUrlString := "//" + imageUrl.Host + imageUrl.Path
-	setErr := reflections.SetField(modelStruct, "ImageUrl", imageUrlString)
-	if setErr != nil {
-		http.Error(w, setErr.Error(), http.StatusInternalServerError)
-		return
-	}
-	setUpdateErr := reflections.SetField(modelStruct, "Update", time.Now())
-	if setUpdateErr != nil {
-		http.Error(w, setUpdateErr.Error(), http.StatusInternalServerError)
-		return
-	}
-	setCreateErr := reflections.SetField(modelStruct, "Create", time.Now())
-	if setCreateErr != nil {
-		http.Error(w, setCreateErr.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, putErr := datastore.Put(c, key, modelStruct)
+	modelStruct := BlobStoreImage{ImageUrl: imageUrlString, Update: time.Now(), Created: time.Now()}
+	_, putErr := datastore.Put(c, key, &modelStruct)
 	if putErr != nil {
 		http.Error(w, putErr.Error(), http.StatusInternalServerError)
 		return
