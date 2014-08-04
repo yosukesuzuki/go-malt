@@ -201,6 +201,7 @@ $(document).ready(function() {
                                 $.post("/admin/rest/" + that.modelName, postData, function(data) {
                                     if (data.message == "created") {
                                         location.href = "/admin/form/#/" + that.modelName + "/list";
+                                        location.reload(true);
                                     } else {
                                         $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
                                     }
@@ -238,7 +239,8 @@ $(document).ready(function() {
                                     putData = setPostData(this.$data.items); 
                                     $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
                                         if (putResponse.message == "updated") {
-                                            location.href = "/admin/form/#/" + that.modelName + "/list/success";
+                                            location.href = "/admin/form/#/" + that.modelName + "/list";
+                                            location.reload(true);
                                         } else {
                                             $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
                                         }
