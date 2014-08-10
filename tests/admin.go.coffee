@@ -1,12 +1,32 @@
-baseURL = "http://localhost:8080"
+# default setting == localdev
+env = "localdev"
+
+settings = {
+  localdev : "http://localhost:8080"
+  gaedev : "https://dev-goappstarter.appspot.com"
+}
+
+if casper.cli.has('env')
+  env = casper.cli.get('env')
+
+baseURL = settings[env]
 casper.start()
 casper.open baseURL + "/admin/"
 casper.then ->
-  @echo @getTitle()
-  currentUrl = @getCurrentUrl()
-  if currentUrl.match(/login/)
-    @click "#admin"
-    @thenClick "#submit-login"
+  if env is "localdev"
+    @echo @getTitle()
+    currentUrl = @getCurrentUrl()
+    if currentUrl.match(/login/)
+      @click "#admin"
+      @thenClick "#submit-login"
+  else if env is "gaedev"
+    #fill id and password passed from cli
+    user_id = casper.cli.get("user_id")
+    user_password = casper.cli.get("user_password")
+    @fill "form#gaia_loginform",
+      Email: user_id
+      Passwd:user_password 
+    , true
 
 # test of /admin/
 casper.then ->
