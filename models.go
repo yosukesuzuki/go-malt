@@ -28,6 +28,7 @@ var defaultValues = map[string]interface{}{"Boolean": false,
 
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+var searchModels = map[string]interface{}{"adminpage": &AdminPageSearch{}, "article": &ArticleSearch{}}
 var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
 var modelDescriptions = map[string]string{
 	"adminpage": "model for storing general information",
@@ -49,6 +50,18 @@ type AdminPage struct {
 
 type AdminPageList []AdminPage
 
+type AdminPageSearch struct {
+	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
+	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
+	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
+	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
+	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
+	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
+	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+}
+
 // Article stores daily update contents
 type Article struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
@@ -66,6 +79,20 @@ type Article struct {
 }
 
 type ArticleList []Article
+
+type ArticleSearch struct {
+	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
+	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
+	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
+	DisplayTime time.Time `datastore:"displaytime" json:"displaytime" datastore_type:"DateTime" verbose_name:"Display Time"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
+	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
+	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
+	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
+	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
+	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+}
 
 type BlobStoreImage struct {
 	Title    string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`

@@ -6,6 +6,7 @@ import (
 	"appengine/datastore"
 	"appengine/image"
 	"appengine/memcache"
+	"appengine/search"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/oleiade/reflections"
@@ -349,6 +350,7 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
 }
 
 func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
@@ -423,6 +425,35 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	_, putErr := datastore.Put(c, key, modelStruct)
 	if putErr != nil {
 		http.Error(w, putErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
+}
+
+func setDataSearchIndex(modelVar string, keyName string, modelStruct interface{}, c appengine.Context, w http.ResponseWriter) {
+	docID := modelVar + "_" + keyName
+	searchStruct := searchModels[modelVar]
+	s := reflect.ValueOf(searchStruct).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		log.Println(typeOfT.Field(i).Name)
+		value, getErr := reflections.GetField(modelStruct, typeOfT.Field(i).Name)
+		if getErr != nil {
+			continue
+		}
+		setErr := reflections.SetField(searchStruct, typeOfT.Field(i).Name, value)
+		if setErr != nil {
+			continue
+		}
+	}
+	index, err := search.Open("global")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, err = index.Put(c, docID, searchStruct)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
