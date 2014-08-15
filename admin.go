@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -345,6 +346,7 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			return
 		}
 	}
+	beforePut(modelStruct)
 	_, putErr := datastore.Put(c, key, modelStruct)
 	if putErr != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -422,6 +424,7 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			}
 		}
 	}
+	beforePut(modelStruct)
 	_, putErr := datastore.Put(c, key, modelStruct)
 	if putErr != nil {
 		http.Error(w, putErr.Error(), http.StatusInternalServerError)
@@ -430,13 +433,60 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
 }
 
+func beforePut(modelStruct interface{}) {
+	imagesFromText(modelStruct)
+}
+
+func imagesFromText(modelStruct interface{}) {
+	//var images []map[string]string
+	s := reflect.ValueOf(modelStruct).Elem()
+	typeOfT := s.Type()
+	var images []map[string]string
+	for i := 0; i < s.NumField(); i++ {
+		log.Println(typeOfT.Field(i).Name)
+		value, getErr := reflections.GetField(modelStruct, typeOfT.Field(i).Name)
+		if getErr != nil {
+			continue
+		}
+		log.Println(value)
+		switch typeOfT.Field(i).Tag.Get("datastore_type") {
+		case "Text":
+			re, _ := regexp.Compile(`!\[(.*)\]\((.*)\)|!\[.*\]\[.*\]|\[.*\]: .*"".*""`)
+			all := re.FindAllStringSubmatch(value.(string), -1)
+			for _, v := range all {
+				var inlineImage map[string]string
+				inlineImage = make(map[string]string)
+				inlineImage["filename"] = v[1]
+				inlineImage["filepath"] = v[2]
+				images = append(images, inlineImage)
+				log.Println(v)
+			}
+
+		}
+	}
+	log.Println(images)
+	jsonData, _ := json.Marshal(images)
+	log.Println(jsonData)
+	if string(jsonData) == "null" {
+		setEmptyErr := reflections.SetField(modelStruct, "Images", "[]")
+		if setEmptyErr != nil {
+			log.Println("set images json error")
+		}
+	} else {
+		setErr := reflections.SetField(modelStruct, "Images", string(jsonData))
+		if setErr != nil {
+			log.Println("set images json error")
+		}
+	}
+}
+
 func setDataSearchIndex(modelVar string, keyName string, modelStruct interface{}, c appengine.Context, w http.ResponseWriter) {
 	docID := modelVar + "_" + keyName
 	searchStruct := searchModels[modelVar]
 	s := reflect.ValueOf(searchStruct).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
-		log.Println(typeOfT.Field(i).Name)
+		//log.Println(typeOfT.Field(i).Name)
 		value, getErr := reflections.GetField(modelStruct, typeOfT.Field(i).Name)
 		if getErr != nil {
 			continue
