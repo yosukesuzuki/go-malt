@@ -90,6 +90,12 @@ $(document).ready(function() {
     });
     Vue.filter('dateFormat', function(value) {
         value = value.replace(/T/," ");
+        var localTime  = moment.utc(value.slice(0, 16)).toDate();
+        localTime = moment(localTime).format('YYYY-MM-DD HH:mm (Z)');
+        return localTime;
+    });
+    Vue.filter('dateFormatUTC', function(value) {
+        value = value.replace(/T/," ");
         return value.slice(0, 16);
     });
     var formApp = {};
