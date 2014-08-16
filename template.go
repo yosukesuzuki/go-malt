@@ -18,10 +18,8 @@ package main
 
 import (
 	"appengine"
-	"doc"
 	"errors"
 	"fmt"
-	//"github.com/gorilla/site/doc"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -33,11 +31,20 @@ import (
 
 type handlerFunc func(http.ResponseWriter, *http.Request) error
 
+type GetError struct {
+	Host string
+	err  error
+}
+
+func (e GetError) Error() string {
+	return e.err.Error()
+}
+
 func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := f(w, r)
 	if err != nil {
 		appengine.NewContext(r).Errorf("Error %s", err.Error())
-		if e, ok := err.(doc.GetError); ok {
+		if e, ok := err.(GetError); ok {
 			http.Error(w, "Error getting files from "+e.Host+".", http.StatusInternalServerError)
 		} else if appengine.IsCapabilityDisabled(err) || appengine.IsOverQuota(err) {
 			http.Error(w, "Internal error: "+err.Error(), http.StatusInternalServerError)
