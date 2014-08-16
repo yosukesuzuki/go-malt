@@ -22,10 +22,11 @@ install:
 - go get github.com/gorilla/mux
 - go get github.com/oleiade/reflections
 before_script:
+- cp -R doc $GAE/goroot/src/pkg
 - goapp serve &
 - sleep 5
 script:
-- casperjs test tests
+- goapp test;casperjs test tests
 after_success:
 - python $GAE/appcfg.py update . --oauth2_refresh_token=$GAE_OAUTH -A dev-goappstarter
 after_script:
