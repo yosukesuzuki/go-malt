@@ -1,38 +1,25 @@
 package main
 
 import (
-	"appengine/aetest"
-	"appengine/datastore"
-	"bytes"
-	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
+	"github.com/oleiade/reflections"
 	"testing"
 )
 
-func TestSetNewEntity(t *testing.T) {
-	c, err := aetest.NewContext(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer c.Close()
-	data := url.Values{}
-	data.Set("displaypage", "true")
-	data.Add("title", "title")
-	data.Add("url", "url")
-	data.Add("pageorder", "1")
-	data.Add("content", "content")
-	r, _ := http.NewRequest("POST", "/admin/rest/adminpage", bytes.NewBufferString(data.Encode()))
-	w := httptest.NewRecorder()
-	modelVar := "adminpage"
-	modelName := modelNames[modelVar]
-	key := datastore.NewKey(c, modelName, "url", 0, nil)
-	setNewEntity(w, r, modelVar)
-	modelStruct := AdminPage{}
-	if err := datastore.Get(c, key, &modelStruct); err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, modelStruct.URL, "url", "url value check")
+func TestImagesFromText(t *testing.T) {
+	modelStruct := models["adminpage"]
+	contentString := `
+	![file](//localhost:8080/_ah/img/l6VnJ25q7BizPxLc4OQelQ==)
 
+	![file](//localhost:8080/_ah/img/RIXogd9LBBsMmoqZXZ_eEQ==)
+	`
+	setErr := reflections.SetField(modelStruct, "Content", contentString)
+	if setErr != nil {
+		t.Errorf("Connot set data for test")
+	}
+	imagesFromText(modelStruct)
+	jsonValue, _ := reflections.GetField(modelStruct, "Images")
+	assertValue := `[{"filename":"file","filepath":"//localhost:8080/_ah/img/l6VnJ25q7BizPxLc4OQelQ=="},{"filename":"file","filepath":"//localhost:8080/_ah/img/RIXogd9LBBsMmoqZXZ_eEQ=="}]`
+	if jsonValue.(string) != assertValue {
+		t.Errorf("imagesFromText is not working properly")
+	}
 }

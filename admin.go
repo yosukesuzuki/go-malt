@@ -438,42 +438,34 @@ func beforePut(modelStruct interface{}) {
 }
 
 func imagesFromText(modelStruct interface{}) {
-	//var images []map[string]string
-	s := reflect.ValueOf(modelStruct).Elem()
-	typeOfT := s.Type()
 	var images []map[string]string
-	for i := 0; i < s.NumField(); i++ {
-		log.Println(typeOfT.Field(i).Name)
-		value, getErr := reflections.GetField(modelStruct, typeOfT.Field(i).Name)
-		if getErr != nil {
-			continue
-		}
-		log.Println(value)
-		switch typeOfT.Field(i).Tag.Get("datastore_type") {
-		case "Text":
-			re, _ := regexp.Compile(`!\[(.*)\]\((.*)\)|!\[.*\]\[.*\]|\[.*\]: .*"".*""`)
-			all := re.FindAllStringSubmatch(value.(string), -1)
-			for _, v := range all {
-				var inlineImage map[string]string
-				inlineImage = make(map[string]string)
-				inlineImage["filename"] = v[1]
-				inlineImage["filepath"] = v[2]
-				images = append(images, inlineImage)
-				log.Println(v)
-			}
-
-		}
+	value, getErr := reflections.GetField(modelStruct, "Content")
+	if getErr != nil {
+		log.Println("cannot get value of Content field")
+		return
+	}
+	log.Println(value)
+	re, _ := regexp.Compile(`!\[(.*)\]\((.*)\)|!\[.*\]\[.*\]|\[.*\]: .*"".*""`)
+	all := re.FindAllStringSubmatch(value.(string), -1)
+	for _, v := range all {
+		var inlineImage map[string]string
+		inlineImage = make(map[string]string)
+		inlineImage["filename"] = v[1]
+		inlineImage["filepath"] = v[2]
+		images = append(images, inlineImage)
+		log.Println(v)
 	}
 	log.Println(images)
 	jsonData, _ := json.Marshal(images)
 	log.Println(jsonData)
-	if string(jsonData) == "null" {
+	jsonDataString := string(jsonData)
+	if jsonDataString == "null" {
 		setEmptyErr := reflections.SetField(modelStruct, "Images", "[]")
 		if setEmptyErr != nil {
 			log.Println("set images json error")
 		}
 	} else {
-		setErr := reflections.SetField(modelStruct, "Images", string(jsonData))
+		setErr := reflections.SetField(modelStruct, "Images", jsonDataString)
 		if setErr != nil {
 			log.Println("set images json error")
 		}
