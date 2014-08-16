@@ -40,7 +40,7 @@ type AdminPage struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
-	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
@@ -54,7 +54,7 @@ type AdminPageSearch struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
-	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
@@ -68,7 +68,7 @@ type Article struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	DisplayTime time.Time `datastore:"displaytime" json:"displaytime" datastore_type:"DateTime" verbose_name:"Display Time(UTC)"`
-	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
@@ -85,7 +85,7 @@ type ArticleSearch struct {
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	DisplayTime time.Time `datastore:"displaytime" json:"displaytime" datastore_type:"DateTime" verbose_name:"Display Time"`
-	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`

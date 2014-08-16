@@ -155,7 +155,6 @@ casper.waitForSelector "form.form-horizontal", ->
     displaypage: true
     title: "title999"
     url: "url999"
-    pageorder: 999
     content: "content999"
     externalurl: "link999"
   , true
@@ -296,7 +295,6 @@ casper.waitForSelector "form.form-horizontal", ->
     title: "title999"
     url: "url999"
     displaytime: "2014-07-25 12:01"
-    pageorder: 999
     content: "content999"
     tagstring: "tag0"
     externalurl: "link999"
