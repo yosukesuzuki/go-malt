@@ -22,7 +22,6 @@ install:
 - go get github.com/gorilla/mux
 - go get github.com/oleiade/reflections
 before_script:
-- cp -R doc $GAE/goroot/src/pkg
 - goapp serve &
 - sleep 5
 script:
