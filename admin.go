@@ -290,6 +290,15 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				//http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
 				//return
 			}
+			if typeOfT.Field(i).Name == "PageOrder" {
+				maxPageOrder := getPageOrderMaxValue(c, modelVar)
+				maxPageOrder = maxPageOrder + 1
+				setPageOrderErr := reflections.SetField(modelStruct, "PageOrder", maxPageOrder)
+				if setPageOrderErr != nil {
+					c.Errorf("cannot set value of max page order")
+				}
+				pageOrderIncre(c, modelVar)
+			}
 			continue
 		}
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
@@ -539,4 +548,39 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	executeJSON(w, 201, map[string]interface{}{"message": "created", "filename": imageUrlString})
+}
+
+func getPageOrderMaxValue(c appengine.Context, modelVar string) int {
+	var maxPageOrder MaxPageOrder
+	modelName := modelNames[modelVar]
+	key := datastore.NewKey(c, "MaxPageOrder", modelName, 0, nil)
+	err := datastore.Get(c, key, &maxPageOrder)
+	if err != nil {
+		newMaxPageOrder := MaxPageOrder{ModelName: modelName, MaxOrder: 0}
+		_, putErr := datastore.Put(c, key, &newMaxPageOrder)
+		if putErr != nil {
+			c.Errorf("cannot put default value of max page order")
+		}
+		return 0
+	}
+	return maxPageOrder.MaxOrder
+}
+
+func pageOrderIncre(c appengine.Context, modelVar string) {
+	var maxPageOrder MaxPageOrder
+	modelName := modelNames[modelVar]
+	key := datastore.NewKey(c, "MaxPageOrder", modelName, 0, nil)
+	err := datastore.Get(c, key, &maxPageOrder)
+	if err != nil {
+		newMaxPageOrder := MaxPageOrder{ModelName: modelName, MaxOrder: 0}
+		_, putErr := datastore.Put(c, key, &newMaxPageOrder)
+		if putErr != nil {
+			c.Errorf("cannot put default value of max page order")
+		}
+	}
+	maxPageOrder.MaxOrder = maxPageOrder.MaxOrder + 1
+	_, putUpdateErr := datastore.Put(c, key, &maxPageOrder)
+	if putUpdateErr != nil {
+		c.Errorf("cannot put update value of max page order")
+	}
 }

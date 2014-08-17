@@ -102,3 +102,8 @@ type BlobStoreImage struct {
 	Update   time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
 	Created  time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
+
+type MaxPageOrder struct {
+	ModelName string `datastore:"modelname" json:"modelname" datastore_type:"String" verbose_name:"Model Name"`
+	MaxOrder  int    `datastore:"maxorder" json:"maxorder" datastore_type:"Integer" verbose_name:"Max Order"`
+}

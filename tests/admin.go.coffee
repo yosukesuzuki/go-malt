@@ -86,12 +86,10 @@ casper.thenOpen baseURL + "/admin/rest/adminpage", ->
   @test.assertEqual jsonData.items[0].displaypage, false, "displaypage of the first entity should be false"
   @test.assertEqual jsonData.items[0].title, "title0", "title of the first entity should be title0"
   @test.assertEqual jsonData.items[0].url, "url0", "url of the first entity should be url0"
-  @test.assertEqual jsonData.items[0].pageorder, 0, "content of the first entity should be 0"
   @test.assertEqual jsonData.items[0].content, "foobar", "title of the first entity should be foobar"
   @test.assertEqual jsonData.items[1].displaypage, true, "displaypage of the first entity should be true"
   @test.assertEqual jsonData.items[1].title, "title1", "title of the first entity should be title1"
   @test.assertEqual jsonData.items[1].url, "url1", "url of the first entity should be url1"
-  @test.assertEqual jsonData.items[1].pageorder, 1, "content of the first entity should be 1"
   @test.assertEqual jsonData.items[1].content, "foobar", "title of the first entity should be foobar"
 
 
@@ -263,7 +261,6 @@ casper.thenOpen baseURL + "/admin/rest/article", ->
   @test.assertEqual jsonData.items[0].displaypage, false, "displaypage of the first entity should be false"
   @test.assertEqual jsonData.items[0].title, "title0", "title of the first entity should be title0"
   @test.assertEqual jsonData.items[0].url, "url0", "url of the first entity should be url0"
-  @test.assertEqual jsonData.items[0].pageorder, 0, "content of the first entity should be 0"
   @test.assertEqual jsonData.items[0].content, "foobar", "title of the first entity should be foobar"
   @test.assertEqual jsonData.items[0].displaytime.replace("T", " ").slice(0, 16), "2014-07-25 12:01", "title of the first entity should be foobar"
 
