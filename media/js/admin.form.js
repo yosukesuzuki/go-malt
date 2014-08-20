@@ -104,6 +104,7 @@ $(document).ready(function() {
         this.modelName = hashArr[1];
         this.crudMethod = hashArr[2];
         this.entityKey = hashArr[3];
+        this.sortResults = [];
         var that = this;
         $.getJSON("/admin/rest/schema/" + that.modelName, function(data) {
             var crudVue = new Vue({
@@ -186,6 +187,55 @@ $(document).ready(function() {
                                     }
                                 }
                             }
+                        });
+                    });
+                    break;
+                case "sort":
+                    var offset = parseInt(that.entityKey);
+                    var requestUrl = "/admin/rest/" + that.modelName;
+                    if (!isNaN(offset)) {
+                        requestUrl += "?offset=" + offset;
+                    }
+                    $.getJSON(requestUrl, function(listData) {
+                        var listVue = new Vue({
+                            el: "#formContainer",
+                            template: "#modelListSortable",
+                            data: {
+                                items: listData.items,
+                                modelName: listData.model_name
+                            },
+                            methods: {
+                                submitOrderUpdate:function(e){
+                                    console.log(that.sortResults)
+                                    $.each(that.sortResults,function(i,val){
+                                        if(val.neworder != val.oldorder){
+                                            var putData = {pageorder:val.neworder}; 
+                                            $.put("/admin/rest/" + that.modelName + "/" + val.url, putData, function(putResponse) {
+                                                console.log(putResponse);
+                                                if (putResponse.message == "updated") {
+                                                    location.href = "/admin/form/#/" + that.modelName + "/list";
+                                                    location.reload(true);
+                                                } else {
+                                                    $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        var orderArray = [];
+                        $.each(listData.items,function(i,val){
+                            orderArray.push(parseInt(val.pageorder));
+                        });
+                        $(".sortable").sortable().on("sortupdate",function(e,ui){
+                            var newOrderArray = [];
+                            $.each($("li.list-group-item"), function(i, val) {
+                               newOrderArray.push({url:val.getAttribute("data-url"),neworder:orderArray[i],oldorder:parseInt(val.getAttribute("data-order"))}); 
+                            });
+                            console.log(newOrderArray);
+                            that.sortResults = newOrderArray;
+                            $("#SaveOrder").removeAttr("disabled");
                         });
                     });
                     break;

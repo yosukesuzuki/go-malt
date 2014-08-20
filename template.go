@@ -31,6 +31,7 @@ import (
 
 type handlerFunc func(http.ResponseWriter, *http.Request) error
 
+// GetError is copied from doc package of https://github.com/gorilla/site
 type GetError struct {
 	Host string
 	err  error
