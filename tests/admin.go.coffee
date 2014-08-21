@@ -53,7 +53,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title1"
     url: "url1"
-    pageorder: 1
     content: "foobar"
     displaypage: "on"
 , ->
@@ -68,7 +67,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title0"
     url: "url0"
-    pageorder: 0
     content: "foobar"
     displaypage: ""
 , ->
@@ -115,7 +113,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title1"
     url: "url1"
-    pageorder: 1
     content: "foobar"
     displaypage: "on"
 , ->
@@ -129,7 +126,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title0"
     url: "url0"
-    pageorder: 0
     content: "foobar"
     displaypage: ""
 , ->
@@ -137,6 +133,48 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   @test.assertHttpStatus 201
   jsonData = JSON.parse(@getPageContent())
   @test.assertEqual jsonData.message, "created", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  method: "post"
+  data:
+    pageorder: "0"
+, ->
+  @echo "page order update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0", ->
+  @echo "check if page order is updated"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0", "title should be title0"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    title: "title0-2"
+    url: "url0-2"
+, ->
+  @echo "partial update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0", ->
+  @echo "check partial update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0-2", "title should be title0-2"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
   @test.assertHttpStatus 200
@@ -181,7 +219,6 @@ casper.repeat 30, ->
     data:
       title: "title" + i
       url: "url" + i
-      pageorder: i
       content: "foobar"
       displaypage: "on"
   , ->
@@ -225,7 +262,6 @@ casper.thenOpen baseURL + "/admin/rest/article",
     title: "title1"
     url: "url1"
     displaytime: "2014-07-25 12:00"
-    pageorder: 1
     content: "foobar"
     tagstring: "tag"
     displaypage: "on"
@@ -242,7 +278,6 @@ casper.thenOpen baseURL + "/admin/rest/article",
     title: "title0"
     url: "url0"
     displaytime: "2014-07-25 12:01"
-    pageorder: 0
     content: "foobar"
     tagstring: "tag0"
     displaypage: ""
@@ -263,6 +298,48 @@ casper.thenOpen baseURL + "/admin/rest/article", ->
   @test.assertEqual jsonData.items[0].url, "url0", "url of the first entity should be url0"
   @test.assertEqual jsonData.items[0].content, "foobar", "title of the first entity should be foobar"
   @test.assertEqual jsonData.items[0].displaytime.replace("T", " ").slice(0, 16), "2014-07-25 12:01", "title of the first entity should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  method: "post"
+  data:
+    pageorder: "0"
+, ->
+  @echo "page order update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check if page order is updated"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0", "title should be title0"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    title: "title0-2"
+    url: "url0-2"
+, ->
+  @echo "partial update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check partial update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0-2", "title should be title0-2"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/rest/article/url0",
   method: "delete"
@@ -307,7 +384,6 @@ casper.repeat 30, ->
       title: "title" + j
       url: "url" + j
       displaytime: "2014-07-25 12:01"
-      pageorder: j
       content: "foobar"
       tagstring: "tag" + j
       displaypage: "on"

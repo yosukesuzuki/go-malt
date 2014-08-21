@@ -187,6 +187,10 @@ func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct})
+	// same process even if method is POST
+	case "POST":
+		updateEntity(w, r, modelVar)
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
 	case "PUT":
 		updateEntity(w, r, modelVar)
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
