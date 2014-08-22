@@ -62,7 +62,12 @@ code {
     </ul>
 </script>
 <script type="x-template" id="modelListTable">
-    <p><a href="#/{{`{{modelName}}`}}/create" class="btn btn-primary" id="createEntity">Create new entity</a></p>
+    <p>
+    <a href="#/{{`{{modelName}}`}}/create" class="btn btn-primary" id="createEntity">Create new entity</a>
+    <a href="#/{{`{{modelName}}`}}/sort/{{`{{offset}}`}}" class="btn btn-info pull-right" id="sortMode">
+    <span class="glyphicon glyphicon-sort"></span>
+    </a>
+    </p>
     <table id="content-list-table" class="table table-bordered table-hover">
         <thead>
             <tr>

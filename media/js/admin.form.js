@@ -168,7 +168,8 @@ $(document).ready(function() {
                                 items: listData.items,
                                 modelName: listData.model_name,
                                 next: nextPage,
-                                previous: previousPage
+                                previous: previousPage,
+                                offset: offset
                             },
                             methods: {
                                 deleteEntity: function(e) {
@@ -202,7 +203,8 @@ $(document).ready(function() {
                             template: "#modelListSortable",
                             data: {
                                 items: listData.items,
-                                modelName: listData.model_name
+                                modelName: listData.model_name,
+                                offset: offset
                             },
                             methods: {
                                 submitOrderUpdate:function(e){
