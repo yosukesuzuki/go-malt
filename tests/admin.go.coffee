@@ -237,9 +237,18 @@ casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
 casper.waitForSelector "#previousButton", ->
   @test.assertEqual @exists("#nextButton"), false, "not found next button"
   @click "#previousButton"
-  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/list", "previous button works"
 
-casper.waitForSelector "tr td:first-child", ->
+casper.waitForSelector "#nextButton", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/list", "previous button works"
+  @click "#sortMode"
+
+casper.waitForSelector "ul.sortable", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/sort/NaN/20", "sort button works"
+
+casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
+  @echo "back to list"
+ 
+casper.waitForSelector "tr td:nth-child(4) button", ->
   @mouseEvent "click", "tr td:nth-child(4) button"
 
 casper.setFilter "page.confirm", (message) ->
@@ -403,9 +412,18 @@ casper.thenOpen baseURL + "/admin/form/#/article/list", ->
 casper.waitForSelector "#previousButton", ->
   @test.assertEqual @exists("#nextButton"), false, "not found next button"
   @click "#previousButton"
-  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/list", "previous button works"
 
-casper.waitForSelector "tr td:first-child", ->
+casper.waitForSelector "#nextButton", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/list", "previous button works"
+  @click "#sortMode"
+
+casper.waitForSelector "ul.sortable", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/sort/NaN/20", "sort button works"
+
+casper.thenOpen baseURL + "/admin/form/#/article/list", ->
+  @echo "back to list"
+
+casper.waitForSelector "tr td:nth-child(4) button", ->
   @mouseEvent "click", "tr td:nth-child(4) button"
 
 casper.setFilter "page.confirm", (message) ->

@@ -19,6 +19,8 @@ import (
 	"time"
 )
 
+const defaultPerPage = 20
+
 // return JSON with Content type header
 func executeJSON(w http.ResponseWriter, statusCode int, data map[string]interface{}) {
 	jsonData, _ := json.Marshal(data)
@@ -46,7 +48,6 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
-	perPage := 20
 	cursorKey := modelVar + "_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
@@ -54,6 +55,13 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
 	} else {
 		offsetParam = 0
+	}
+	tmpPerPageValue := r.FormValue("per_page")
+	var perPage int
+	if tmpPerPageValue != "" {
+		perPage, _ = strconv.Atoi(tmpPerPageValue)
+	} else {
+		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
 	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
@@ -118,7 +126,6 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 	modelVar := "article"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
-	perPage := 20
 	cursorKey := modelVar + "_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
@@ -126,6 +133,13 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 		offsetParam, _ = strconv.Atoi(tmpOffsetValue)
 	} else {
 		offsetParam = 0
+	}
+	tmpPerPageValue := r.FormValue("per_page")
+	var perPage int
+	if tmpPerPageValue != "" {
+		perPage, _ = strconv.Atoi(tmpPerPageValue)
+	} else {
+		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
 	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
