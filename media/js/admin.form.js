@@ -27,26 +27,27 @@ $.extend({
 });
 
 //todo; temporally fix for datepicker and vuejs causes empty value.
-function setPostData(arrayObj){
+function setPostData(arrayObj) {
     var postData = {};
     $.each(arrayObj, function(i, val) {
         if (val.frmValue === true) {
             postData[val.frmName] = "on";
-        }else if((typeof val.frmFormat !== "undefined")&&(val.frmFormat=="date-time")){
-            postData[val.frmName] = $("#f_"+val.frmName).val();
+        } else if ((typeof val.frmFormat !== "undefined") && (val.frmFormat == "date-time")) {
+            postData[val.frmName] = $("#f_" + val.frmName).val();
         } else {
             postData[val.frmName] = val.frmValue;
         }
     });
     return postData;
 }
-function setFormUtils(){
+
+function setFormUtils() {
     $('.form-datetime').datetimepicker({
         format: "yyyy-mm-dd hh:ii"
     });
-    $.getJSON("/admin/image/upload/url",function(data){
+    $.getJSON("/admin/image/upload/url", function(data) {
         var uploadUrl = data.uploadurl;
-        var options ={
+        var options = {
             uploadUrl: uploadUrl,
             uploadFieldName: 'file',
             downloadFieldName: 'filename',
@@ -61,19 +62,21 @@ function setFormUtils(){
             errorText: "Error uploading file",
             extraParams: {},
             extraHeaders: {},
-            onReceivedFile: function(file) {
+            onReceivedFile: function(file) {},
+            onUploadedFile: function(json) {},
+            customErrorHandler: function() {
+                return true;
             },
-            onUploadedFile: function(json) {
+            customUploadHandler: function(file) {
+                return true;
             },
-            customErrorHandler: function() { return true; },
-            customUploadHandler: function(file) { return true; },
             dataProcessor: function(data) {
                 //refresh upload url on uploaded
                 var that = this;
-                $.getJSON("/admin/image/upload/url",function(refreshData){
+                $.getJSON("/admin/image/upload/url", function(refreshData) {
                     that.uploadUrl = refreshData.uploadurl;
                 });
-                return data; 
+                return data;
             }
         };
         $('textarea').inlineattach(options);
@@ -89,13 +92,13 @@ $(document).ready(function() {
         }
     });
     Vue.filter('dateFormat', function(value) {
-        value = value.replace(/T/," ");
-        var localTime  = moment.utc(value.slice(0, 16)).toDate();
+        value = value.replace(/T/, " ");
+        var localTime = moment.utc(value.slice(0, 16)).toDate();
         localTime = moment(localTime).format('YYYY-MM-DD HH:mm (Z)');
         return localTime;
     });
     Vue.filter('dateFormatUTC', function(value) {
-        value = value.replace(/T/," ");
+        value = value.replace(/T/, " ");
         return value.slice(0, 16);
     });
     var formApp = {};
@@ -104,6 +107,8 @@ $(document).ready(function() {
         this.modelName = hashArr[1];
         this.crudMethod = hashArr[2];
         this.entityKey = hashArr[3];
+        this.perPage = hashArr[4];
+        this.sortResults = [];
         var that = this;
         $.getJSON("/admin/rest/schema/" + that.modelName, function(data) {
             var crudVue = new Vue({
@@ -167,7 +172,9 @@ $(document).ready(function() {
                                 items: listData.items,
                                 modelName: listData.model_name,
                                 next: nextPage,
-                                previous: previousPage
+                                previous: previousPage,
+                                offset: offset,
+                                per_page: listData.per_page
                             },
                             methods: {
                                 deleteEntity: function(e) {
@@ -189,6 +196,66 @@ $(document).ready(function() {
                         });
                     });
                     break;
+                case "sort":
+                    var perPage = parseInt(that.perPage); 
+                    if (isNaN(perPage)) {
+                        perPage = 20;
+                    }
+                    var requestUrl = "/admin/rest/" + that.modelName+"?per_page="+perPage*2;
+                    var offset = parseInt(that.entityKey);
+                    if (!isNaN(offset)) {
+                        requestUrl += "&offset=" + offset;
+                    }
+                    $.getJSON(requestUrl, function(listData) {
+                        var listVue = new Vue({
+                            el: "#formContainer",
+                            template: "#modelListSortable",
+                            data: {
+                                items: listData.items,
+                                modelName: listData.model_name,
+                                offset: offset
+                            },
+                            methods: {
+                                submitOrderUpdate: function(e) {
+                                    console.log(that.sortResults)
+                                    $.each(that.sortResults, function(i, val) {
+                                        if (val.neworder != val.oldorder) {
+                                            var putData = {
+                                                pageorder: val.neworder
+                                            };
+                                            $.put("/admin/rest/" + that.modelName + "/" + val.url, putData, function(putResponse) {
+                                                console.log(putResponse);
+                                                if (putResponse.message == "updated") {
+                                                    location.href = "/admin/form/#/" + that.modelName + "/list";
+                                                    location.reload(true);
+                                                } else {
+                                                    $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        var orderArray = [];
+                        $.each(listData.items, function(i, val) {
+                            orderArray.push(parseInt(val.pageorder));
+                        });
+                        $(".sortable").sortable().on("sortupdate", function(e, ui) {
+                            var newOrderArray = [];
+                            $.each($("li.list-group-item"), function(i, val) {
+                                newOrderArray.push({
+                                    url: val.getAttribute("data-url"),
+                                    neworder: orderArray[i],
+                                    oldorder: parseInt(val.getAttribute("data-order"))
+                                });
+                            });
+                            console.log(newOrderArray);
+                            that.sortResults = newOrderArray;
+                            $("#SaveOrder").removeAttr("disabled");
+                        });
+                    });
+                    break;
                 case "create":
                     var createVue = new Vue({
                         el: "#formContainer",
@@ -203,7 +270,7 @@ $(document).ready(function() {
                             submitUpdate: function(e) {
                                 e.preventDefault();
                                 console.log(this.$data);
-                                postData = setPostData(this.$data.items); 
+                                postData = setPostData(this.$data.items);
                                 $.post("/admin/rest/" + that.modelName, postData, function(data) {
                                     if (data.message == "created") {
                                         location.href = "/admin/form/#/" + that.modelName + "/list";
@@ -242,7 +309,7 @@ $(document).ready(function() {
                                 submitUpdate: function(e) {
                                     e.preventDefault();
                                     console.log(this.$data);
-                                    putData = setPostData(this.$data.items); 
+                                    putData = setPostData(this.$data.items);
                                     $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
                                         if (putResponse.message == "updated") {
                                             location.href = "/admin/form/#/" + that.modelName + "/list";

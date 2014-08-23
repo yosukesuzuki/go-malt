@@ -40,7 +40,7 @@ type AdminPage struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
-	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
@@ -48,13 +48,15 @@ type AdminPage struct {
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
+// AdminPageList is the array type of AdminPage
 type AdminPageList []AdminPage
 
+// AdminPageSearch is the type for indexing the content of AdminPage
 type AdminPageSearch struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
-	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
@@ -68,7 +70,7 @@ type Article struct {
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	DisplayTime time.Time `datastore:"displaytime" json:"displaytime" datastore_type:"DateTime" verbose_name:"Display Time(UTC)"`
-	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
@@ -78,14 +80,16 @@ type Article struct {
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
+// ArticleList is the array type of Article
 type ArticleList []Article
 
+// ArticleSearch is the type for indexing the content of Article
 type ArticleSearch struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
 	DisplayTime time.Time `datastore:"displaytime" json:"displaytime" datastore_type:"DateTime" verbose_name:"Display Time"`
-	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"Page Order"`
+	PageOrder   float64   `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
@@ -94,11 +98,18 @@ type ArticleSearch struct {
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
+// BlobStoreImage is the type for storing meta data of blobstore contents
 type BlobStoreImage struct {
 	Title    string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`
 	Note     string    `datastore:"note,noindex" json:"content" datastore_type:"Text" verbose_name:"Description"`
 	BlobKey  string    `datastore:"blob_key" json:"tagstring" datastore_type:"String" verbose_name:"Blobkey"`
-	ImageUrl string    `datastore:"image_url" json:"image_url" datastore_type:"String" verbose_name:"Image Url"`
+	ImageURL string    `datastore:"image_url" json:"image_url" datastore_type:"String" verbose_name:"Image Url"`
 	Update   time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
 	Created  time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
+}
+
+// MaxPageOrder is the type for storing max number of page order of a struct
+type MaxPageOrder struct {
+	ModelName string `datastore:"modelname" json:"modelname" datastore_type:"String" verbose_name:"Model Name"`
+	MaxOrder  int    `datastore:"maxorder" json:"maxorder" datastore_type:"Integer" verbose_name:"Max Order"`
 }

@@ -19,6 +19,8 @@ import (
 	"time"
 )
 
+const defaultPerPage = 20
+
 // return JSON with Content type header
 func executeJSON(w http.ResponseWriter, statusCode int, data map[string]interface{}) {
 	jsonData, _ := json.Marshal(data)
@@ -46,7 +48,6 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	modelVar := "adminpage"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
-	perPage := 20
 	cursorKey := modelVar + "_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
@@ -55,8 +56,15 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 	} else {
 		offsetParam = 0
 	}
+	tmpPerPageValue := r.FormValue("per_page")
+	var perPage int
+	if tmpPerPageValue != "" {
+		perPage, _ = strconv.Atoi(tmpPerPageValue)
+	} else {
+		perPage = defaultPerPage
+	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
+	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -118,7 +126,6 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 	modelVar := "article"
 	modelName := modelNames[modelVar]
 	c := appengine.NewContext(r)
-	perPage := 20
 	cursorKey := modelVar + "_cursor"
 	tmpOffsetValue := r.FormValue("offset")
 	var offsetParam int
@@ -127,8 +134,15 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 	} else {
 		offsetParam = 0
 	}
+	tmpPerPageValue := r.FormValue("per_page")
+	var perPage int
+	if tmpPerPageValue != "" {
+		perPage, _ = strconv.Atoi(tmpPerPageValue)
+	} else {
+		perPage = defaultPerPage
+	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Order("-update").Limit(perPage)
+	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -187,6 +201,10 @@ func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct})
+	// same process even if method is POST
+	case "POST":
+		updateEntity(w, r, modelVar)
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
 	case "PUT":
 		updateEntity(w, r, modelVar)
 		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "message": "updated"})
@@ -290,6 +308,15 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				//http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
 				//return
 			}
+			if typeOfT.Field(i).Name == "PageOrder" {
+				maxPageOrder := getPageOrderMaxValue(c, modelVar)
+				maxPageOrder = maxPageOrder + 1
+				setPageOrderErr := reflections.SetField(modelStruct, "PageOrder", maxPageOrder)
+				if setPageOrderErr != nil {
+					c.Errorf("cannot set value of max page order") //use default value
+				}
+				pageOrderIncre(c, modelVar)
+			}
 			continue
 		}
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
@@ -318,8 +345,8 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				}
 				continue
 			}
-			date_yyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
-			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, date_yyyymmddhhmm)
+			dateyyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, dateyyyymmddhhmm)
 			if err != nil {
 				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
 				if setDefaultErr != nil {
@@ -340,8 +367,8 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	}
 	urlValue, err := reflections.GetField(modelStruct, "URL")
 	if urlValue == "" {
-		setUrlErr := reflections.SetField(modelStruct, "URL", keyName)
-		if setUrlErr != nil {
+		setURLErr := reflections.SetField(modelStruct, "URL", keyName)
+		if setURLErr != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -369,10 +396,58 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		http.Error(w, getErr.Error(), http.StatusInternalServerError)
 		return
 	}
+	r.ParseForm()
+	var parameters map[string]bool
+	parameters = make(map[string]bool)
+	for parameterName := range r.Form {
+		log.Println(parameterName)
+		parameters[parameterName] = true
+	}
 	for i := 0; i < s.NumField(); i++ {
 		// log.Println(typeOfT.Field(i).Name)
 		// log.Println(typeOfT.Field(i).Tag.Get("datastore_type"))
-		// log.Println(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+		// specic process for verbose_name == "-"
+		// - record update time
+		// - update pageorder if pageorder value is sent
+		if typeOfT.Field(i).Tag.Get("verbose_name") == "-" {
+			switch typeOfT.Field(i).Name {
+			case "Update":
+				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
+				if setDefaultErr != nil {
+					http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
+					return
+				}
+				continue
+			case "PageOrder":
+				if r.FormValue(typeOfT.Field(i).Tag.Get("json")) != "" {
+					tmpStringInt, _ := strconv.Atoi(r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+					err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, tmpStringInt)
+					if err != nil {
+						setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, 0)
+						if setDefaultErr != nil {
+							http.Error(w, err.Error(), http.StatusInternalServerError)
+							return
+						}
+					}
+				}
+				continue
+			default:
+				continue
+			}
+		}
+		// skipped if field == URL
+		if typeOfT.Field(i).Name == "URL" {
+			continue
+		}
+		if val, ok := parameters[typeOfT.Field(i).Tag.Get("json")]; ok {
+			log.Println(typeOfT.Field(i).Name)
+			log.Println("value exist")
+			log.Println(val)
+		} else {
+			log.Println(typeOfT.Field(i).Name)
+			log.Println("no value=>")
+			continue
+		}
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
 		case "Boolean":
 			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
@@ -391,20 +466,8 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				}
 			}
 		case "DateTime":
-			if typeOfT.Field(i).Tag.Get("json") == "update" {
-				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
-				if setDefaultErr != nil {
-					http.Error(w, setDefaultErr.Error(), http.StatusInternalServerError)
-					return
-				}
-				continue
-			}
-			if typeOfT.Field(i).Tag.Get("json") == "created" {
-				log.Println("skipped")
-				continue
-			}
-			date_yyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
-			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, date_yyyymmddhhmm)
+			dateyyyymmddhhmm, _ := time.Parse("2006-01-02 15:04", r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, dateyyyymmddhhmm)
 			if err != nil {
 				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, time.Now())
 				if setDefaultErr != nil {
@@ -441,10 +504,10 @@ func imagesFromText(modelStruct interface{}) {
 	var images []map[string]string
 	value, getErr := reflections.GetField(modelStruct, "Content")
 	if getErr != nil {
-		log.Println("cannot get value of Content field")
+		//log.Println("cannot get value of Content field")
 		return
 	}
-	log.Println(value)
+	// log.Println(value)
 	re, _ := regexp.Compile(`!\[(.*)\]\((.*)\)|!\[.*\]\[.*\]|\[.*\]: .*"".*""`)
 	all := re.FindAllStringSubmatch(value.(string), -1)
 	for _, v := range all {
@@ -453,11 +516,11 @@ func imagesFromText(modelStruct interface{}) {
 		inlineImage["filename"] = v[1]
 		inlineImage["filepath"] = v[2]
 		images = append(images, inlineImage)
-		log.Println(v)
+		// log.Println(v)
 	}
-	log.Println(images)
+	// log.Println(images)
 	jsonData, _ := json.Marshal(images)
-	log.Println(jsonData)
+	// log.Println(jsonData)
 	jsonDataString := string(jsonData)
 	if jsonDataString == "null" {
 		setEmptyErr := reflections.SetField(modelStruct, "Images", "[]")
@@ -500,7 +563,7 @@ func setDataSearchIndex(modelVar string, keyName string, modelStruct interface{}
 	}
 }
 
-func imageUploadUrl(w http.ResponseWriter, r *http.Request) {
+func imageUploadURL(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	uploadURL, err := blobstore.UploadURL(c, "/admin/image/upload/handler", nil)
 	if err != nil {
@@ -524,19 +587,54 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var imageOptions image.ServingURLOptions
-	imageUrl, urlErr := image.ServingURL(c, file[0].BlobKey, &imageOptions)
+	imageURL, urlErr := image.ServingURL(c, file[0].BlobKey, &imageOptions)
 	if urlErr != nil {
 		http.Error(w, urlErr.Error(), http.StatusInternalServerError)
 		return
 	}
 	modelName := "BlobStoreImage"
 	key := datastore.NewKey(c, modelName, string(file[0].BlobKey), 0, nil)
-	imageUrlString := "//" + imageUrl.Host + imageUrl.Path
-	modelStruct := BlobStoreImage{ImageUrl: imageUrlString, Update: time.Now(), Created: time.Now()}
+	imageURLString := "//" + imageURL.Host + imageURL.Path
+	modelStruct := BlobStoreImage{ImageURL: imageURLString, Update: time.Now(), Created: time.Now()}
 	_, putErr := datastore.Put(c, key, &modelStruct)
 	if putErr != nil {
 		http.Error(w, putErr.Error(), http.StatusInternalServerError)
 		return
 	}
-	executeJSON(w, 201, map[string]interface{}{"message": "created", "filename": imageUrlString})
+	executeJSON(w, 201, map[string]interface{}{"message": "created", "filename": imageURLString})
+}
+
+func getPageOrderMaxValue(c appengine.Context, modelVar string) int {
+	var maxPageOrder MaxPageOrder
+	modelName := modelNames[modelVar]
+	key := datastore.NewKey(c, "MaxPageOrder", modelName, 0, nil)
+	err := datastore.Get(c, key, &maxPageOrder)
+	if err != nil {
+		newMaxPageOrder := MaxPageOrder{ModelName: modelName, MaxOrder: 0}
+		_, putErr := datastore.Put(c, key, &newMaxPageOrder)
+		if putErr != nil {
+			c.Errorf("cannot put default value of max page order")
+		}
+		return 0
+	}
+	return maxPageOrder.MaxOrder
+}
+
+func pageOrderIncre(c appengine.Context, modelVar string) {
+	var maxPageOrder MaxPageOrder
+	modelName := modelNames[modelVar]
+	key := datastore.NewKey(c, "MaxPageOrder", modelName, 0, nil)
+	err := datastore.Get(c, key, &maxPageOrder)
+	if err != nil {
+		newMaxPageOrder := MaxPageOrder{ModelName: modelName, MaxOrder: 0}
+		_, putErr := datastore.Put(c, key, &newMaxPageOrder)
+		if putErr != nil {
+			c.Errorf("cannot put default value of max page order")
+		}
+	}
+	maxPageOrder.MaxOrder = maxPageOrder.MaxOrder + 1
+	_, putUpdateErr := datastore.Put(c, key, &maxPageOrder)
+	if putUpdateErr != nil {
+		c.Errorf("cannot put update value of max page order")
+	}
 }

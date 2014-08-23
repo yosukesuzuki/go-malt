@@ -16,7 +16,7 @@ func init() {
 	s.HandleFunc("/rest/adminpage", handleAdminPage)
 	s.HandleFunc("/rest/article", handleArticle)
 	s.HandleFunc("/rest/{modelVar}/{keyName}", handleModelKeyName)
-	s.HandleFunc("/image/upload/url", imageUploadUrl)
+	s.HandleFunc("/image/upload/url", imageUploadURL)
 	s.HandleFunc("/image/upload/handler", handleImageUpload)
 	r.Handle("/article/{keyName}", handlerFunc(articlePage))
 	r.Handle("/{keyName}", handlerFunc(generalPage))

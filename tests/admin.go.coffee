@@ -53,7 +53,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title1"
     url: "url1"
-    pageorder: 1
     content: "foobar"
     displaypage: "on"
 , ->
@@ -68,7 +67,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title0"
     url: "url0"
-    pageorder: 0
     content: "foobar"
     displaypage: ""
 , ->
@@ -86,12 +84,10 @@ casper.thenOpen baseURL + "/admin/rest/adminpage", ->
   @test.assertEqual jsonData.items[0].displaypage, false, "displaypage of the first entity should be false"
   @test.assertEqual jsonData.items[0].title, "title0", "title of the first entity should be title0"
   @test.assertEqual jsonData.items[0].url, "url0", "url of the first entity should be url0"
-  @test.assertEqual jsonData.items[0].pageorder, 0, "content of the first entity should be 0"
   @test.assertEqual jsonData.items[0].content, "foobar", "title of the first entity should be foobar"
   @test.assertEqual jsonData.items[1].displaypage, true, "displaypage of the first entity should be true"
   @test.assertEqual jsonData.items[1].title, "title1", "title of the first entity should be title1"
   @test.assertEqual jsonData.items[1].url, "url1", "url of the first entity should be url1"
-  @test.assertEqual jsonData.items[1].pageorder, 1, "content of the first entity should be 1"
   @test.assertEqual jsonData.items[1].content, "foobar", "title of the first entity should be foobar"
 
 
@@ -117,7 +113,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title1"
     url: "url1"
-    pageorder: 1
     content: "foobar"
     displaypage: "on"
 , ->
@@ -131,7 +126,6 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   data:
     title: "title0"
     url: "url0"
-    pageorder: 0
     content: "foobar"
     displaypage: ""
 , ->
@@ -139,6 +133,48 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   @test.assertHttpStatus 201
   jsonData = JSON.parse(@getPageContent())
   @test.assertEqual jsonData.message, "created", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  method: "post"
+  data:
+    pageorder: "0"
+, ->
+  @echo "page order update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0", ->
+  @echo "check if page order is updated"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0", "title should be title0"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    title: "title0-2"
+    url: "url0-2"
+, ->
+  @echo "partial update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage/url0", ->
+  @echo "check partial update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0-2", "title should be title0-2"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
   @test.assertHttpStatus 200
@@ -155,7 +191,6 @@ casper.waitForSelector "form.form-horizontal", ->
     displaypage: true
     title: "title999"
     url: "url999"
-    pageorder: 999
     content: "content999"
     externalurl: "link999"
   , true
@@ -184,7 +219,6 @@ casper.repeat 30, ->
     data:
       title: "title" + i
       url: "url" + i
-      pageorder: i
       content: "foobar"
       displaypage: "on"
   , ->
@@ -203,9 +237,18 @@ casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
 casper.waitForSelector "#previousButton", ->
   @test.assertEqual @exists("#nextButton"), false, "not found next button"
   @click "#previousButton"
-  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/list", "previous button works"
 
-casper.waitForSelector "tr td:first-child", ->
+casper.waitForSelector "#nextButton", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/list", "previous button works"
+  @click "#sortMode"
+
+casper.waitForSelector "ul.sortable", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/adminpage/sort/NaN/20", "sort button works"
+
+casper.thenOpen baseURL + "/admin/form/#/adminpage/list", ->
+  @echo "back to list"
+ 
+casper.waitForSelector "tr td:nth-child(4) button", ->
   @mouseEvent "click", "tr td:nth-child(4) button"
 
 casper.setFilter "page.confirm", (message) ->
@@ -228,7 +271,6 @@ casper.thenOpen baseURL + "/admin/rest/article",
     title: "title1"
     url: "url1"
     displaytime: "2014-07-25 12:00"
-    pageorder: 1
     content: "foobar"
     tagstring: "tag"
     displaypage: "on"
@@ -245,7 +287,6 @@ casper.thenOpen baseURL + "/admin/rest/article",
     title: "title0"
     url: "url0"
     displaytime: "2014-07-25 12:01"
-    pageorder: 0
     content: "foobar"
     tagstring: "tag0"
     displaypage: ""
@@ -264,9 +305,50 @@ casper.thenOpen baseURL + "/admin/rest/article", ->
   @test.assertEqual jsonData.items[0].displaypage, false, "displaypage of the first entity should be false"
   @test.assertEqual jsonData.items[0].title, "title0", "title of the first entity should be title0"
   @test.assertEqual jsonData.items[0].url, "url0", "url of the first entity should be url0"
-  @test.assertEqual jsonData.items[0].pageorder, 0, "content of the first entity should be 0"
   @test.assertEqual jsonData.items[0].content, "foobar", "title of the first entity should be foobar"
   @test.assertEqual jsonData.items[0].displaytime.replace("T", " ").slice(0, 16), "2014-07-25 12:01", "title of the first entity should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  method: "post"
+  data:
+    pageorder: "0"
+, ->
+  @echo "page order update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check if page order is updated"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0", "title should be title0"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    title: "title0-2"
+    url: "url0-2"
+, ->
+  @echo "partial update request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check partial update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.item.pageorder, 0, "page order should be 0"
+  @test.assertEqual jsonData.item.title, "title0-2", "title should be title0-2"
+  @test.assertEqual jsonData.item.url, "url0", "url should be url0"
+  @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/rest/article/url0",
   method: "delete"
@@ -296,7 +378,6 @@ casper.waitForSelector "form.form-horizontal", ->
     title: "title999"
     url: "url999"
     displaytime: "2014-07-25 12:01"
-    pageorder: 999
     content: "content999"
     tagstring: "tag0"
     externalurl: "link999"
@@ -312,7 +393,6 @@ casper.repeat 30, ->
       title: "title" + j
       url: "url" + j
       displaytime: "2014-07-25 12:01"
-      pageorder: j
       content: "foobar"
       tagstring: "tag" + j
       displaypage: "on"
@@ -332,9 +412,18 @@ casper.thenOpen baseURL + "/admin/form/#/article/list", ->
 casper.waitForSelector "#previousButton", ->
   @test.assertEqual @exists("#nextButton"), false, "not found next button"
   @click "#previousButton"
-  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/list", "previous button works"
 
-casper.waitForSelector "tr td:first-child", ->
+casper.waitForSelector "#nextButton", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/list", "previous button works"
+  @click "#sortMode"
+
+casper.waitForSelector "ul.sortable", ->
+  @test.assertEqual @getCurrentUrl(), baseURL + "/admin/form/#/article/sort/NaN/20", "sort button works"
+
+casper.thenOpen baseURL + "/admin/form/#/article/list", ->
+  @echo "back to list"
+
+casper.waitForSelector "tr td:nth-child(4) button", ->
   @mouseEvent "click", "tr td:nth-child(4) button"
 
 casper.setFilter "page.confirm", (message) ->

@@ -80,3 +80,9 @@ https://github.com/chjj/marked
 
 ### Inline Attachment
 https://github.com/Rovak/InlineAttachment
+
+### Moment.js
+http://momentjs.com/
+
+### html5sortable
+https://github.com/voidberg/html5sortable
