@@ -73,7 +73,7 @@ type Article struct {
 	PageOrder   int       `datastore:"pageorder" json:"pageorder" datastore_type:"Integer" verbose_name:"-"`
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Body Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
-	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString"`
+	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString(comma separated)"`
 	Tags        []string  `datastore:"tags" json:"tags" datastore_type:"StringList" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`

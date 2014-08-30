@@ -497,7 +497,23 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 }
 
 func beforePut(modelStruct interface{}) {
+	tagStringToArray(modelStruct)
 	imagesFromText(modelStruct)
+}
+
+// tagStringToArray sets data from TagString
+func tagStringToArray(modelStruct interface{}) {
+	value, getErr := reflections.GetField(modelStruct, "TagString")
+	if getErr != nil {
+		log.Println("cannot get value of TagString field")
+		return
+	}
+	// log.Println(value)
+	tags := strings.Split(strings.Trim(value.(string), ","), ",")
+	setErr := reflections.SetField(modelStruct, "Tags", tags)
+	if setErr != nil {
+		log.Println("set images json error")
+	}
 }
 
 func imagesFromText(modelStruct interface{}) {
