@@ -186,8 +186,8 @@ casper.waitForSelector "tr td:first-child", ->
 casper.then ->
   @click "#createEntity"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: true
     title: "title999"
     url: "url999"
@@ -200,16 +200,16 @@ casper.waitForSelector "tr td:first-child", ->
   @test.assertEqual tempArr.length isnt 0, true, "check table list"
   @mouseEvent "click", "tr td:nth-child(3) a:first-child"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: false
   , true
 
 casper.waitForSelector "tr td:first-child", ->
   @mouseEvent "click", "tr td:nth-child(3) a:first-child"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @test.assertEqual false, @getFormValues("form.form-horizontal").displaypage, "check data update"
+casper.waitForSelector "form.form", ->
+  @test.assertEqual false, @getFormValues("form.form").displaypage, "check data update"
 
 i = 0
 casper.repeat 30, ->
@@ -372,8 +372,8 @@ casper.thenOpen baseURL + "/admin/form/#/article/list", ->
 casper.then ->
   @click "#createEntity"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: true
     title: "title999"
     url: "url999"
