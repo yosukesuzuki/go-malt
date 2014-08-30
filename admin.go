@@ -400,7 +400,7 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	var parameters map[string]bool
 	parameters = make(map[string]bool)
 	for parameterName := range r.Form {
-		log.Println(parameterName)
+		// log.Println(parameterName)
 		parameters[parameterName] = true
 	}
 	for i := 0; i < s.NumField(); i++ {
@@ -440,12 +440,12 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			continue
 		}
 		if val, ok := parameters[typeOfT.Field(i).Tag.Get("json")]; ok {
-			log.Println(typeOfT.Field(i).Name)
-			log.Println("value exist")
+			//log.Println(typeOfT.Field(i).Name)
+			//log.Println("value exist")
 			log.Println(val)
 		} else {
-			log.Println(typeOfT.Field(i).Name)
-			log.Println("no value=>")
+			//log.Println(typeOfT.Field(i).Name)
+			//log.Println("no value=>")
 			continue
 		}
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
