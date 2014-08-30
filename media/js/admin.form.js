@@ -241,18 +241,21 @@ $(document).ready(function() {
                         $.each(listData.items, function(i, val) {
                             orderArray.push(parseInt(val.pageorder));
                         });
-                        $(".sortable").sortable().on("sortupdate", function(e, ui) {
-                            var newOrderArray = [];
-                            $.each($("li.list-group-item"), function(i, val) {
-                                newOrderArray.push({
-                                    url: val.getAttribute("data-url"),
-                                    neworder: orderArray[i],
-                                    oldorder: parseInt(val.getAttribute("data-order"))
+                        var sortEl = document.querySelector(".sortable");
+                        new Sortable(sortEl,{
+                            onUpdate:function(e){
+                                 var newOrderArray = [];
+                                $.each($("li.list-group-item"), function(i, val) {
+                                    newOrderArray.push({
+                                        url: val.getAttribute("data-url"),
+                                        neworder: orderArray[i],
+                                        oldorder: parseInt(val.getAttribute("data-order"))
+                                    });
                                 });
-                            });
-                            console.log(newOrderArray);
-                            that.sortResults = newOrderArray;
-                            $("#SaveOrder").removeAttr("disabled");
+                                console.log(newOrderArray);
+                                that.sortResults = newOrderArray;
+                                $("#SaveOrder").removeAttr("disabled");
+                            }
                         });
                     });
                     break;
