@@ -92,33 +92,29 @@ code {
     </ul>
 </script>
 <script type="x-template" id="modelForm">
-    <form class="form-horizontal" role="form"  v-on="submit:submitUpdate">
+    <form class="form" role="form"  v-on="submit:submitUpdate">
         <div class="form-group" v-repeat="items">
-            <label class="col-sm-2 control-label" for="f_{{`{{frmName}}`}}">{{`{{frmTitle}}`}}</label>
-            <div class="col-sm-10" v-if="frmFormat == 'date-time'">
+            <label for="f_{{`{{frmName}}`}}">{{`{{frmTitle}}`}}</label>
+            <div v-if="frmFormat == 'date-time'">
                 <input type="text" class="form-datetime" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue | dateFormatUTC">
                 <span>UTC Time</span>
             </div>
-            <div class="col-sm-10" v-if="frmType == 'string' && frmMaxLength <= 500 && !frmFormat">
+            <div v-if="frmType == 'string' && frmMaxLength <= 500 && !frmFormat">
                 <input type="text" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue" v-disable="frmName">
             </div>
-            <div class="col-sm-10" v-if="frmType == 'integer'">
+            <div v-if="frmType == 'integer'">
                 <input type="number" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue">
             </div>
-            <div class="col-sm-10" v-if="frmType == 'boolean'">
+            <div v-if="frmType == 'boolean'">
                 <input type="checkbox" class="form-control" name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue">
             </div>
-            <div class="col-sm-10 editor" v-if="frmType == 'string' && !frmMaxLength && !frmFormat">
+            <div class="editor" v-if="frmType == 'string' && !frmMaxLength && !frmFormat">
                 <textarea name="{{`{{frmName}}`}}" id="f_{{`{{frmName}}`}}" v-model="frmValue"></textarea>
                 <div v-html="frmValue | marked"></div>
             </div>
         </div>
-        <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary btn-lg active" id="submitButton">Submit</button>
-            <button type="button" class="btn btn-default btn-lg active" v-on="click:cancel">Cancel</button>
-        </div>
-      </div>
+        <button type="submit" class="btn btn-primary btn-lg active" id="submitButton">Submit</button>
+        <button type="button" class="btn btn-default btn-lg active" v-on="click:cancel">Cancel</button>
     </form>
 </script>
 {{end}}
