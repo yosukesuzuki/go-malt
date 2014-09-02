@@ -35,7 +35,9 @@ var modelDescriptions = map[string]string{
 	"article":   "model for storing article",
 }
 
-// AdminPage stores content for general pages
+// AdminPage stores content for general pages.
+// URL is reserved for Key Name.
+// do not use "draft" for property name, it also reserved
 type AdminPage struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
@@ -44,6 +46,8 @@ type AdminPage struct {
 	Content     string    `datastore:"content,noindex" json:"content" datastore_type:"Text" verbose_name:"Content"`
 	Images      string    `datastore:"images,noindex" json:"images" datastore_type:"Text" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
+	IsDraft     bool      `datastore:"isdraft" json:"isdraft" datastore_type:"Boolean" verbose_name:"-"`
+	Revision    int       `datastore:"revision" json:"revision" datastore_type:"Integer" verbose_name:"-"`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
@@ -65,6 +69,8 @@ type AdminPageSearch struct {
 }
 
 // Article stores daily update contents
+// URL is reserved for Key Name.
+// do not use "draft" for property name, it also reserved
 type Article struct {
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage bool      `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
@@ -76,6 +82,8 @@ type Article struct {
 	TagString   string    `datastore:"tagstring,noindex" json:"tagstring" datastore_type:"String" verbose_name:"TagString(comma separated)"`
 	Tags        []string  `datastore:"tags" json:"tags" datastore_type:"StringList" verbose_name:"-"`
 	ExternalURL string    `datastore:"externalurl" json:"externalurl" datastore_type:"String" verbose_name:"Link to ..."`
+	IsDraft     bool      `datastore:"isdraft" json:"isdraft" datastore_type:"Boolean" verbose_name:"-"`
+	Revision    int       `datastore:"revision" json:"revision" datastore_type:"Integer" verbose_name:"-"`
 	Update      time.Time `datastore:"update" json:"update" datastore_type:"DateTime" verbose_name:"-"`
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }

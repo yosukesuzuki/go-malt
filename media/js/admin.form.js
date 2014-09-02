@@ -322,11 +322,25 @@ $(document).ready(function() {
                                         }
                                     });
                                 },
+                                submitDraft: function(e) {
+                                    e.preventDefault();
+                                    console.log(this.$data);
+                                    putData = setPostData(this.$data.items);
+                                    putData["draft"] = "on";
+                                    $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
+                                        if (putResponse.message == "updated") {
+                                            $("#postAlert").html('<div class="alert alert-success" role="alert">draft is saved</div>');
+                                        } else {
+                                            $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
+                                        }
+                                    });
+                                },
                                 cancel: function(e) {
                                     location.href = "/admin/form/#/" + that.modelName + "/list";
                                 }
                             }
                         });
+                        $("#submitDraft").removeClass("disabled");
                         setFormUtils();
                         // $('.form-datetime').datetimepicker({
                         //     format: "yyyy-mm-dd hh:ii"
