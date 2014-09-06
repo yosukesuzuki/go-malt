@@ -200,7 +200,17 @@ func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct})
+		modelStructDraft := draftModels[modelVar]
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
+		draftErr := datastore.Get(c, draftKey, modelStructDraft)
+		var isDraft bool
+		if draftErr != nil {
+			isDraft = false
+			log.Println("draft is not found")
+		} else {
+			isDraft = true
+		}
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct, "draft": modelStructDraft, "is_draft": isDraft})
 	// same process even if method is POST
 	case "POST":
 		updateEntity(w, r, modelVar)

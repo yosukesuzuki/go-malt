@@ -351,6 +351,25 @@ casper.thenOpen baseURL + "/admin/rest/article/url0", ->
   @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    draft: "on"
+    content: "foobar draft"
+, ->
+  @echo "draft put request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check draft update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.is_draft, true, "draft flg is true"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
   method: "delete"
 , ->
   @echo "DELETE request has been sent."

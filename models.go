@@ -28,6 +28,7 @@ var defaultValues = map[string]interface{}{"Boolean": false,
 
 //Map for Models which can be used in restful API
 var models = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
+var draftModels = map[string]interface{}{"adminpage": &AdminPage{}, "article": &Article{}}
 var searchModels = map[string]interface{}{"adminpage": &AdminPageSearch{}, "article": &ArticleSearch{}}
 var modelNames = map[string]string{"adminpage": "AdminPage", "article": "Article"}
 var modelDescriptions = map[string]string{
