@@ -329,9 +329,9 @@ $(document).ready(function() {
                                     putData["draft"] = "on";
                                     $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
                                         if (putResponse.message == "updated") {
-                                            $("#postAlert").html('<div class="alert alert-success" role="alert">draft is saved</div>');
+                                            $("#postAlert").html('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>draft is saved</div>');
                                         } else {
-                                            $("#postAlert").html('<div class="alert alert-danger" role="alert">error posting data</div>');
+                                            $("#postAlert").html('<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>error posting data</div>');
                                         }
                                     });
                                 },

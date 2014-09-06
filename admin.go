@@ -64,7 +64,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Filter("isdraft =", false).Order("-pageorder").Limit(perPage)
+	q := datastore.NewQuery(modelName).Filter("archive =", false).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -142,7 +142,7 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Filter("isdraft =", false).Order("-pageorder").Limit(perPage)
+	q := datastore.NewQuery(modelName).Filter("archive =", false).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -380,7 +380,7 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		return
 	}
 	childKey := datastore.NewIncompleteKey(c, modelName, key)
-	setErr := reflections.SetField(modelStruct, "IsDraft", true)
+	setErr := reflections.SetField(modelStruct, "Archive", true)
 	if setErr != nil {
 		http.Error(w, setErr.Error(), http.StatusInternalServerError)
 		return
@@ -510,7 +510,7 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			return
 		}
 		childKey := datastore.NewIncompleteKey(c, modelName, key)
-		setErr := reflections.SetField(modelStruct, "IsDraft", true)
+		setErr := reflections.SetField(modelStruct, "Archive", true)
 		if setErr != nil {
 			http.Error(w, setErr.Error(), http.StatusInternalServerError)
 			return
@@ -520,11 +520,16 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			http.Error(w, putErr.Error(), http.StatusInternalServerError)
 			return
 		}
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
+		deleteErr := datastore.Delete(c, draftKey)
+		if deleteErr != nil {
+			log.Println("no draft entity")
+		}
 		setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
 	} else {
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
 		// todo: query children and if an old draft exists update it or put new child
-		draftKey := datastore.NewIncompleteKey(c, modelName, key)
-		setErr := reflections.SetField(modelStruct, "IsDraft", true)
+		setErr := reflections.SetField(modelStruct, "Archive", true)
 		if setErr != nil {
 			http.Error(w, setErr.Error(), http.StatusInternalServerError)
 			return

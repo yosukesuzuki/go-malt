@@ -12,7 +12,19 @@ indexes:
 
 - kind: AdminPage
   properties:
+  - name: archive
+  - name: pageorder
+    direction: desc
+
+- kind: AdminPage
+  properties:
   - name: isdraft
+  - name: pageorder
+    direction: desc
+
+- kind: Article
+  properties:
+  - name: archive
   - name: pageorder
     direction: desc
 
