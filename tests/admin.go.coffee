@@ -186,8 +186,8 @@ casper.waitForSelector "tr td:first-child", ->
 casper.then ->
   @click "#createEntity"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: true
     title: "title999"
     url: "url999"
@@ -200,16 +200,16 @@ casper.waitForSelector "tr td:first-child", ->
   @test.assertEqual tempArr.length isnt 0, true, "check table list"
   @mouseEvent "click", "tr td:nth-child(3) a:first-child"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: false
   , true
 
 casper.waitForSelector "tr td:first-child", ->
   @mouseEvent "click", "tr td:nth-child(3) a:first-child"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @test.assertEqual false, @getFormValues("form.form-horizontal").displaypage, "check data update"
+casper.waitForSelector "form.form", ->
+  @test.assertEqual false, @getFormValues("form.form").displaypage, "check data update"
 
 i = 0
 casper.repeat 30, ->
@@ -351,6 +351,25 @@ casper.thenOpen baseURL + "/admin/rest/article/url0", ->
   @test.assertEqual jsonData.item.content, "foobar", "content should be foobar"
 
 casper.thenOpen baseURL + "/admin/rest/article/url0",
+  # put method does not work correctly in casperjs,no data is sent
+  # so use post instead of put here
+  method: "post"
+  data:
+    draft: "on"
+    content: "foobar draft"
+, ->
+  @echo "draft put request has been sent."
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "updated", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0", ->
+  @echo "check draft update"
+  @test.assertHttpStatus 200
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.is_draft, true, "draft flg is true"
+
+casper.thenOpen baseURL + "/admin/rest/article/url0",
   method: "delete"
 , ->
   @echo "DELETE request has been sent."
@@ -372,8 +391,8 @@ casper.thenOpen baseURL + "/admin/form/#/article/list", ->
 casper.then ->
   @click "#createEntity"
 
-casper.waitForSelector "form.form-horizontal", ->
-  @fill "form.form-horizontal",
+casper.waitForSelector "form.form", ->
+  @fill "form.form",
     displaypage: true
     title: "title999"
     url: "url999"

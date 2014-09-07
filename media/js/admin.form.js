@@ -197,11 +197,11 @@ $(document).ready(function() {
                     });
                     break;
                 case "sort":
-                    var perPage = parseInt(that.perPage); 
+                    var perPage = parseInt(that.perPage);
                     if (isNaN(perPage)) {
                         perPage = 20;
                     }
-                    var requestUrl = "/admin/rest/" + that.modelName+"?per_page="+perPage*2;
+                    var requestUrl = "/admin/rest/" + that.modelName + "?per_page=" + perPage * 2;
                     var offset = parseInt(that.entityKey);
                     if (!isNaN(offset)) {
                         requestUrl += "&offset=" + offset;
@@ -242,9 +242,9 @@ $(document).ready(function() {
                             orderArray.push(parseInt(val.pageorder));
                         });
                         var sortEl = document.querySelector(".sortable");
-                        new Sortable(sortEl,{
-                            onUpdate:function(e){
-                                 var newOrderArray = [];
+                        new Sortable(sortEl, {
+                            onUpdate: function(e) {
+                                var newOrderArray = [];
                                 $.each($("li.list-group-item"), function(i, val) {
                                     newOrderArray.push({
                                         url: val.getAttribute("data-url"),
@@ -295,6 +295,12 @@ $(document).ready(function() {
                     break;
                 case "update":
                     $.getJSON("/admin/rest/" + that.modelName + "/" + that.entityKey, function(data) {
+                        if (data.is_draft === true) {
+                            //override item into draft
+                            if (moment(data.draft.update) > moment(data.item.update)) {
+                                data.item = data.draft;
+                            }
+                        }
                         $.each(formElementArr, function(i, val) {
                             val.frmValue = data.item[val.frmName];
                             formElementArr[i] = val;
@@ -304,6 +310,7 @@ $(document).ready(function() {
                             template: "#modelForm",
                             data: {
                                 items: formElementArr,
+                                draft: data.is_draft
                             },
                             filters: {
                                 marked: marked
@@ -322,11 +329,25 @@ $(document).ready(function() {
                                         }
                                     });
                                 },
+                                submitDraft: function(e) {
+                                    e.preventDefault();
+                                    console.log(this.$data);
+                                    putData = setPostData(this.$data.items);
+                                    putData["draft"] = "on";
+                                    $.put("/admin/rest/" + that.modelName + "/" + that.entityKey, putData, function(putResponse) {
+                                        if (putResponse.message == "updated") {
+                                            $("#postAlert").html('<div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>draft is saved</div>');
+                                        } else {
+                                            $("#postAlert").html('<div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>error posting data</div>');
+                                        }
+                                    });
+                                },
                                 cancel: function(e) {
                                     location.href = "/admin/form/#/" + that.modelName + "/list";
                                 }
                             }
                         });
+                        $("#submitDraft").removeClass("disabled");
                         setFormUtils();
                         // $('.form-datetime').datetimepicker({
                         //     format: "yyyy-mm-dd hh:ii"

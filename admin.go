@@ -64,7 +64,7 @@ func getAdminPageList(w http.ResponseWriter, r *http.Request) map[string]interfa
 		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
+	q := datastore.NewQuery(modelName).Filter("archive =", false).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -142,7 +142,7 @@ func getArticleList(w http.ResponseWriter, r *http.Request) map[string]interface
 		perPage = defaultPerPage
 	}
 	cursorKeyCurrent := cursorKey + strconv.Itoa(offsetParam)
-	q := datastore.NewQuery(modelName).Order("-pageorder").Limit(perPage)
+	q := datastore.NewQuery(modelName).Filter("archive =", false).Order("-pageorder").Limit(perPage)
 	item, err := memcache.Get(c, cursorKeyCurrent)
 	if err == nil {
 		cursor, err := datastore.DecodeCursor(string(item.Value))
@@ -200,7 +200,17 @@ func handleModelKeyName(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct})
+		modelStructDraft := draftModels[modelVar]
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
+		draftErr := datastore.Get(c, draftKey, modelStructDraft)
+		var isDraft bool
+		if draftErr != nil {
+			isDraft = false
+			log.Println("draft is not found")
+		} else {
+			isDraft = true
+		}
+		executeJSON(w, 200, map[string]interface{}{"model_name": modelVar, "item": modelStruct, "draft": modelStructDraft, "is_draft": isDraft})
 	// same process even if method is POST
 	case "POST":
 		updateEntity(w, r, modelVar)
@@ -379,6 +389,17 @@ func setNewEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	childKey := datastore.NewIncompleteKey(c, modelName, key)
+	setErr := reflections.SetField(modelStruct, "Archive", true)
+	if setErr != nil {
+		http.Error(w, setErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, childPutErr := datastore.Put(c, childKey, modelStruct)
+	if childPutErr != nil {
+		http.Error(w, putErr.Error(), http.StatusInternalServerError)
+		return
+	}
 	setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
 }
 
@@ -400,7 +421,7 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 	var parameters map[string]bool
 	parameters = make(map[string]bool)
 	for parameterName := range r.Form {
-		log.Println(parameterName)
+		// log.Println(parameterName)
 		parameters[parameterName] = true
 	}
 	for i := 0; i < s.NumField(); i++ {
@@ -440,17 +461,18 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 			continue
 		}
 		if val, ok := parameters[typeOfT.Field(i).Tag.Get("json")]; ok {
-			log.Println(typeOfT.Field(i).Name)
-			log.Println("value exist")
+			//log.Println(typeOfT.Field(i).Name)
+			//log.Println("value exist")
 			log.Println(val)
 		} else {
-			log.Println(typeOfT.Field(i).Name)
-			log.Println("no value=>")
+			//log.Println(typeOfT.Field(i).Name)
+			//log.Println("no value=>")
 			continue
 		}
 		switch typeOfT.Field(i).Tag.Get("datastore_type") {
 		case "Boolean":
-			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
+			boolValue := (r.FormValue(typeOfT.Field(i).Tag.Get("json")) == "on")
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, boolValue)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -476,7 +498,8 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 				}
 			}
 		default:
-			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, r.FormValue(typeOfT.Field(i).Tag.Get("json")))
+			newValue := r.FormValue(typeOfT.Field(i).Tag.Get("json"))
+			err := reflections.SetField(modelStruct, typeOfT.Field(i).Name, newValue)
 			if err != nil {
 				setDefaultErr := reflections.SetField(modelStruct, typeOfT.Field(i).Name, defaultValues[typeOfT.Field(i).Tag.Get("datastore_type")])
 				if setDefaultErr != nil {
@@ -488,16 +511,79 @@ func updateEntity(w http.ResponseWriter, r *http.Request, modelVar string) {
 		}
 	}
 	beforePut(modelStruct)
-	_, putErr := datastore.Put(c, key, modelStruct)
-	if putErr != nil {
-		http.Error(w, putErr.Error(), http.StatusInternalServerError)
-		return
+	if r.FormValue("draft") != "on" {
+		//save new version as update version and save same one as child
+		increRevision(modelStruct)
+		_, putErr := datastore.Put(c, key, modelStruct)
+		if putErr != nil {
+			http.Error(w, putErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		childKey := datastore.NewIncompleteKey(c, modelName, key)
+		setErr := reflections.SetField(modelStruct, "Archive", true)
+		if setErr != nil {
+			http.Error(w, setErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, childPutErr := datastore.Put(c, childKey, modelStruct)
+		if childPutErr != nil {
+			http.Error(w, putErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
+		deleteErr := datastore.Delete(c, draftKey)
+		if deleteErr != nil {
+			log.Println("no draft entity")
+		}
+		setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
+	} else {
+		draftKey := datastore.NewKey(c, "Draft"+modelName, keyName, 0, nil)
+		// todo: query children and if an old draft exists update it or put new child
+		setErr := reflections.SetField(modelStruct, "Archive", true)
+		if setErr != nil {
+			http.Error(w, setErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, draftPutErr := datastore.Put(c, draftKey, modelStruct)
+		if draftPutErr != nil {
+			http.Error(w, draftPutErr.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
-	setDataSearchIndex(modelVar, keyName, modelStruct, c, w)
 }
 
 func beforePut(modelStruct interface{}) {
+	tagStringToArray(modelStruct)
 	imagesFromText(modelStruct)
+}
+
+func increRevision(modelStruct interface{}) {
+	value, getErr := reflections.GetField(modelStruct, "Revision")
+	if getErr != nil {
+		log.Println("cannot get value of TagString field")
+		return
+	}
+	// log.Println(value)
+	newValue := value.(int) + 1
+	setErr := reflections.SetField(modelStruct, "Revision", newValue)
+	if setErr != nil {
+		log.Println("set images json error")
+	}
+}
+
+// tagStringToArray sets data from TagString
+func tagStringToArray(modelStruct interface{}) {
+	value, getErr := reflections.GetField(modelStruct, "TagString")
+	if getErr != nil {
+		log.Println("cannot get value of TagString field")
+		return
+	}
+	// log.Println(value)
+	tags := strings.Split(strings.Trim(value.(string), ","), ",")
+	setErr := reflections.SetField(modelStruct, "Tags", tags)
+	if setErr != nil {
+		log.Println("set images json error")
+	}
 }
 
 func imagesFromText(modelStruct interface{}) {
