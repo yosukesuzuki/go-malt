@@ -455,27 +455,4 @@ casper.thenOpen baseURL + "/admin/image/upload/url", ->
   jsonData = JSON.parse(@getPageContent())
   @test.assertMatch jsonData.uploadurl,/^\/_ah\/upload/,"test upload url"
 
-
-# add content by post
-casper.thenOpen baseURL + "/admin/rest/adminpage",
-  @echo "create about page"
-  method: "post"
-  data:
-    title: "About this site."
-    url: "about"
-    content: """This site is the showcase of GAE Go Starter.
-      GAE, Google App Engine, is one of PaaS platform to build a web application.
-      GAE has some excellent features for developers, for example, auto scaling and maintainance free key value store, taskque and so on.
-      Go is the best perfermance language for web application, and GAE with go launchs new instances fastest than python and java.
-      This starter template is collection of sample implementations of GAE/Go, so developers can develop new applications based on this app.
-      And this Starter app has content management functions, so it is easy to use this application as a corporate page or blog engine.
-      """
-    displaypage: "on"
-, ->
-  @echo "POST request has been sent."
-  @test.assertHttpStatus 201
-  jsonData = JSON.parse(@getPageContent())
-  @test.assertEqual jsonData.message, "created", "return created message"
-
-
 casper.run()
