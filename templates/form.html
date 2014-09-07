@@ -93,6 +93,9 @@ code {
 </script>
 <script type="x-template" id="modelForm">
     <form class="form" role="form"  v-on="submit:submitUpdate">
+        <div v-if="draft == true">
+        <h4>(this is draft version)</h4>
+        </div>
         <div class="form-group" v-repeat="items">
             <label for="f_{{`{{frmName}}`}}">{{`{{frmTitle}}`}}</label>
             <div v-if="frmFormat == 'date-time'">

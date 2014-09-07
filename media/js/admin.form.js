@@ -197,11 +197,11 @@ $(document).ready(function() {
                     });
                     break;
                 case "sort":
-                    var perPage = parseInt(that.perPage); 
+                    var perPage = parseInt(that.perPage);
                     if (isNaN(perPage)) {
                         perPage = 20;
                     }
-                    var requestUrl = "/admin/rest/" + that.modelName+"?per_page="+perPage*2;
+                    var requestUrl = "/admin/rest/" + that.modelName + "?per_page=" + perPage * 2;
                     var offset = parseInt(that.entityKey);
                     if (!isNaN(offset)) {
                         requestUrl += "&offset=" + offset;
@@ -242,9 +242,9 @@ $(document).ready(function() {
                             orderArray.push(parseInt(val.pageorder));
                         });
                         var sortEl = document.querySelector(".sortable");
-                        new Sortable(sortEl,{
-                            onUpdate:function(e){
-                                 var newOrderArray = [];
+                        new Sortable(sortEl, {
+                            onUpdate: function(e) {
+                                var newOrderArray = [];
                                 $.each($("li.list-group-item"), function(i, val) {
                                     newOrderArray.push({
                                         url: val.getAttribute("data-url"),
@@ -295,6 +295,12 @@ $(document).ready(function() {
                     break;
                 case "update":
                     $.getJSON("/admin/rest/" + that.modelName + "/" + that.entityKey, function(data) {
+                        if (data.is_draft === true) {
+                            //override item into draft
+                            if (moment(data.draft.update) > moment(data.item.update)) {
+                                data.item = data.draft;
+                            }
+                        }
                         $.each(formElementArr, function(i, val) {
                             val.frmValue = data.item[val.frmName];
                             formElementArr[i] = val;
@@ -304,6 +310,7 @@ $(document).ready(function() {
                             template: "#modelForm",
                             data: {
                                 items: formElementArr,
+                                draft: data.is_draft
                             },
                             filters: {
                                 marked: marked
