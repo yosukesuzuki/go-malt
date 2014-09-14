@@ -25,7 +25,7 @@ casper.then ->
     user_password = casper.cli.get("user_password")
     @fill "form#gaia_loginform",
       Email: user_id
-      Passwd:user_password 
+      Passwd:user_password
     , true
 
 # add content by post
@@ -41,7 +41,7 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
 
   GAE has some excellent features for developers, for example, auto scaling and maintainance free key value store, taskque and so on.
 
-  Go is the best perfermance language for web application, and GAE with go launchs new instances fastest than python and java.
+  Go is the best perfermance language for web application, and GAE with go launchs new instances faster than python and java.
 
   This starter template is collection of sample implementations of GAE/Go, so developers can develop new applications based on this app.
 
