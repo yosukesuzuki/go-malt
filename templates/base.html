@@ -17,6 +17,30 @@
     padding-top: 50px;
     padding-bottom: 20px;
     }
+    footer{
+    background-color:#95a5a6;
+    }
+    .topWrapper {
+    position: relative;
+    min-height: 600px;
+    background-image:url("/media/img/malt-bg-32.png");
+    background-size:cover;
+    background-position : 30% 20%;
+    }
+    @media screen and (max-width: 600px) {
+        .topWrapper {
+        min-height: 400px;
+        }
+    }
+    
+    .topInside {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+    }
     </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,19 +59,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">GAE Go Starter</a>
+          <a class="navbar-brand" href="/">Malt</a>
         </div>
-        <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div><!--/.navbar-collapse -->
       </div>
     </div>
     <div>
