@@ -16,9 +16,8 @@
     body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background-color:#95a5a6;
+    background-color:#ccc;
     }
-    
     .topWrapper {
     position: relative;
     min-height: 550px;
@@ -26,9 +25,20 @@
     background-size:cover;
     background-position : 30% 20%;
     }
+    .topWrapper p {
+    font-size:1.5em;
+    }
+    @media screen and (min-width: 1200px) {
+        .topWrapper {
+        min-height: 650px;
+        }
+    }
     @media screen and (max-width: 600px) {
         .topWrapper {
         min-height: 450px;
+        }
+        .topWrapper p {
+        line-height:1em;
         }
     }
     .topInside {
