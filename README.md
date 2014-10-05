@@ -1,11 +1,11 @@
-gae-go-starter
+Malt
 ==============
 
 web application starter template for GAE/go
 
 What is this?
 
-- Starter template for Google App Engine Go
+- Starter template for Google App Engine/Go
 - CMS included 
 - Easy to deploy
     - just type "goapp deploy"
@@ -45,9 +45,6 @@ Datastore models
 ## /admin.go
 Admin applications, REST API for JS applications
 
-## /settings.go
-Application Settings
-
 ## /templates
 html templates
 
@@ -59,15 +56,15 @@ static files
 ### gorilla/mux
 http://www.gorillatoolkit.org/pkg/mux
 
-### gorilla/site
-https://github.com/gorilla/site
-
 ## Reflections
 https://github.com/oleiade/reflections
 
 ## js/css
 ### bootstrap
 http://getbootstrap.com/
+
+### bootstrap theme
+http://bootswatch.com/flatly/
 
 ### bootstrap-datetimepicker.js
 by Stefan Petre

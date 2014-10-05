@@ -9,13 +9,91 @@
     <meta property="og:image" content="{{.ogimage}}" />
     <meta name="author" content="">
     <link rel="shortcut icon" href="/favicon.ico">
-    <title>{{.title}} Go App Starter for GAE/Go</title>
+    <title>{{.title}}:Malt, Web Application Starter for GAE/Go</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="/media/css/flatly.min.css">
     <style>
     body {
     padding-top: 50px;
     padding-bottom: 20px;
+    }
+    .topWrapper {
+    position: relative;
+    min-height: 550px;
+    background-image:url("/media/img/malt-bg-32.png");
+    background-size:cover;
+    background-position : 48% 20%;
+    }
+    .topWrapper p {
+    font-size:1.5em;
+    }
+    @media screen and (min-width: 1200px) {
+        .topWrapper {
+        min-height: 650px;
+        }
+    }
+    @media screen and (max-width: 1199px) {
+        .functions {
+        padding-bottom:0.9em;
+        border-bottom:1px #ddd solid;
+        }
+    }
+    @media screen and (max-width: 600px) {
+        .topWrapper {
+        min-height: 450px;
+        }
+        .topWrapper p {
+        line-height:1em;
+        }
+    }
+    .topInside {
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    -webkit-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+    color:white;
+    }
+    .topInside h1 {
+        font-size:4em;
+    }
+    .marketing {
+    padding-top:30px;
+    padding-bottom:30px;
+    }
+    .marketing .col-lg-4 {
+    margin-bottom: 20px;
+    text-align: center;
+    }
+    .marketing h2 {
+    font-weight: normal;
+    }
+    .marketing .col-lg-4 p {
+    margin-right: 10px;
+    margin-left: 10px;
+    }
+    .curled-box {
+    position:relative;
+    background-color:#798d8f;
+    border-radius: 50%;
+    height: 180px;
+    width: 180px;
+    margin: 0 auto 30px auto;
+    }
+    span.features {
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    top: 63%;
+    margin-left: -50px;
+    margin-top: -50px;
+    color: #fff;
+    font-size: 60px;
+    display: table;
+    transition: all 0.3s ease;
     }
     </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -35,19 +113,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">GAE Go Starter</a>
+          <a class="navbar-brand" href="/">Malt</a>
         </div>
         <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div><!--/.navbar-collapse -->
+          <ul class="nav navbar-nav">
+            <li><a href="https://github.com/yosukesuzuki/go-malt">Github</a></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div>
@@ -67,11 +139,6 @@
                 <div class="g-plusone" data-size="tall" data-annotation="inline" data-width="300"></div>
                 </p>
             </div>
-            <p>
-                &copy; Company 2014 
-                &middot;<a href="/about/">About</a>
-                &middot;<a href="/contact/">Contact</a>
-            </p>
         </div>
     </footer>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -100,10 +167,8 @@
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
     ga('create', '{{gaID}}', '{{baseUrl}}');
     ga('send', 'pageview');
-
     </script>
 </body>
 </html>

@@ -1,12 +1,43 @@
 {{ define "content"}}
 <!-- Main component for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <div class="container">
-        <h1>
-            {{ .body }}
-        </h1>
-    </div>
+<div class="topWrapper">
+    <div class="topInside">
+       <h1>
+           Malt 
+       </h1>
+       <p>
+       Malt is a web application starter template built on Google App Engine/Go(GAE/Go).
+       </p>
+       <p>
+       GAE/Go is very powerful platform, and you can run your application in a minute.
+       </p>
+       <p>
+       <a href="https://github.com/yosukesuzuki/go-malt" class="btn btn-success">github</a>
+       <a href="#marketing" class="btn btn-default">more</a>
+       </p>
+       <a href="https://www.flickr.com/photos/joshua/2390963379/" target="_blank">Photo from flickr: Whisky / Joshua Rappeneker</a>
+   </div>
 </div>
-<div class="container">
+<div class="container marketing" id="marketing">
+    <div class="row">
+        <div class="col-lg-4 functions">
+            <div class="curled-box"><span class="glyphicon glyphicon-pencil features"></span></div>
+            <h2>CMS included</h2>
+            <p>Malt has a simple content management system, you can use as a corporate site or a blog.</p>
+            <a href="/cms" class="btn btn-default">more</a>
+        </div>
+        <div class="col-lg-4 functions">
+            <div class="curled-box"><span class="glyphicon glyphicon-search features"></span></div>
+            <h2>Search Engine included</h2>
+            <p>When you add contents to Malt from CMS, contents are saved to Full-Text-Search Index.</p>
+            <a href="/searchengine" class="btn btn-default">more</a>
+        </div>
+        <div class="col-lg-4 functions">
+            <div class="curled-box"><span class="glyphicon glyphicon-cloud-upload features"></span></div>
+            <h2>Deploy in a minute</h2>
+            <p>Just type &quot;goapp deploy&quot;</p>
+            <a href="/deploy" class="btn btn-default">more</a>
+        </div>
+    </div>
 </div>
 {{end}}
