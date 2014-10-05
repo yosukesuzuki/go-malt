@@ -48,6 +48,65 @@ casper.thenOpen baseURL + "/admin/rest/adminpage",
   And this Starter app has content management functions, so it is easy to use this application as a corporate page or blog engine.
 """
     displaypage: "on"
+    pageorder: "0"
+, ->
+  @echo "POST request has been sent."
+  @test.assertHttpStatus 201
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "created", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage",
+  method: "post"
+  data:
+    title: "CMS included"
+    url: "cms"
+    content: """
+  Malt has simple content management system.
+
+  Markdown editor works on browser and you can drag & drop image files to insert.
+
+  Draft content is supported. Save content which is under construction.
+
+
+"""
+    displaypage: "on"
+, ->
+  @echo "POST request has been sent."
+  @test.assertHttpStatus 201
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "created", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage",
+  method: "post"
+  data:
+    title: "Search Engine"
+    url: "searchengine"
+    content: """
+  Content which is published is automatically saved Full-Text Search index.
+
+  So you can provide search engine function by default to your users.
+
+"""
+    displaypage: "on"
+, ->
+  @echo "POST request has been sent."
+  @test.assertHttpStatus 201
+  jsonData = JSON.parse(@getPageContent())
+  @test.assertEqual jsonData.message, "created", "return created message"
+
+casper.thenOpen baseURL + "/admin/rest/adminpage",
+  method: "post"
+  data:
+    title: "Deploy in a minute"
+    url: "deploy"
+    content: """
+  It's very very very easy to deploy this appliction.
+
+  You have to type just 'goapp deploy'.
+
+  You can get a scalable web application in a minute.
+"""
+    displaypage: "on"
 , ->
   @echo "POST request has been sent."
   @test.assertHttpStatus 201
