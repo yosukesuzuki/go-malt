@@ -21,6 +21,7 @@ install:
 - go env
 - go get github.com/gorilla/mux
 - go get github.com/oleiade/reflections
+- go get github.com/russross/blackfriday
 before_script:
 - goapp serve &
 - sleep 5

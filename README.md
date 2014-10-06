@@ -59,6 +59,9 @@ http://www.gorillatoolkit.org/pkg/mux
 ## Reflections
 https://github.com/oleiade/reflections
 
+## Blackfriday
+https://github.com/russross/blackfriday
+
 ## js/css
 ### bootstrap
 http://getbootstrap.com/
