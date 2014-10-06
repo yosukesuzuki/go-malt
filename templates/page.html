@@ -1,6 +1,18 @@
 {{ define "content"}}
 <!-- Main component for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <h1>{{ .body }}</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>{{ .title }}</h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 page-main">
+            <div class="page-post">
+                <p class="page-post-meta">{{.update}}</p>
+                {{ .body }}
+            </div>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
 </div>
 {{end}}
