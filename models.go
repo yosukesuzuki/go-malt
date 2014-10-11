@@ -58,6 +58,7 @@ type AdminPageList []AdminPage
 
 // AdminPageSearch is the type for indexing the content of AdminPage
 type AdminPageSearch struct {
+	ModelName   string    `datastore:"modelname" json:"modelname" datastore_type:"String" verbose_name:"Model Name"`
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`
@@ -94,6 +95,7 @@ type ArticleList []Article
 
 // ArticleSearch is the type for indexing the content of Article
 type ArticleSearch struct {
+	ModelName   string    `datastore:"modelname" json:"modelname" datastore_type:"String" verbose_name:"Model Name"`
 	URL         string    `datastore:"url" json:"url" datastore_type:"String" verbose_name:"URL=Key Name"`
 	DisplayPage string    `datastore:"displaypage" json:"displaypage" datastore_type:"Boolean" verbose_name:"Display this page"`
 	Title       string    `datastore:"title,required" json:"title" datastore_type:"String" verbose_name:"Title"`

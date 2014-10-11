@@ -628,6 +628,13 @@ func setDataSearchIndex(modelVar string, keyName string, modelStruct interface{}
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		//log.Println(typeOfT.Field(i).Name)
+		if typeOfT.Field(i).Name == "ModelName" {
+			setErr := reflections.SetField(searchStruct, typeOfT.Field(i).Name, modelVar)
+			if setErr != nil {
+				continue
+			}
+			continue
+		}
 		value, getErr := reflections.GetField(modelStruct, typeOfT.Field(i).Name)
 		if getErr != nil {
 			continue
