@@ -107,6 +107,8 @@ type ArticleSearch struct {
 	Created     time.Time `datastore:"created" json:"created" datastore_type:"DateTime" verbose_name:"-"`
 }
 
+type ArticleSearchList []ArticleSearch
+
 // BlobStoreImage is the type for storing meta data of blobstore contents
 type BlobStoreImage struct {
 	Title    string    `datastore:"title" json:"title" datastore_type:"String" verbose_name:"Title"`

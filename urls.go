@@ -19,6 +19,7 @@ func init() {
 	s.HandleFunc("/image/upload/url", imageUploadURL)
 	s.HandleFunc("/image/upload/handler", handleImageUpload)
 	r.Handle("/article/{keyName}", handlerFunc(articlePage))
+	r.HandleFunc("/search", searchPage)
 	r.Handle("/{keyName}", handlerFunc(generalPage))
 	r.Handle("/", handlerFunc(index))
 	http.Handle("/", r)
