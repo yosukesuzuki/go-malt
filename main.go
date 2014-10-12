@@ -50,10 +50,11 @@ func articlePage(w http.ResponseWriter, r *http.Request) error {
 }
 
 func searchPage(w http.ResponseWriter, r *http.Request) error {
+	keyword := r.FormValue("keyword")
 	data := map[string]interface{}{
-		"title":       "Search",
-		"description": "Search Results",
-		"body":        "",
+		"title":       "Search Results of " + keyword,
+		"description": "Search Results of " + keyword,
+		"keyword":     keyword,
 	}
 	return executeTemplate(w, "searchIndex", 200, data)
 }

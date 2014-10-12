@@ -1,6 +1,34 @@
 {{ define "content"}}
-<!-- Main component for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <h1>{{ .body }}</h1>
+<div class="container">
+  <div class="page-header">
+    <div class="row">
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <label class="sr-only" for="keyword">Keyword</label>
+            <input type="text" name="keyword" class="form-control" value="{{ .keyword }}" id="keyword" placeholder="Enter Keyword">
+          </div>
+          <button type="submit" class="btn btn-default">Search</button>
+        </form>
+      </div>
+  </div>
+  <div class="row">
+    <h5>{{ .title }}</h5>
+    <div class="col-sm-8 page-main">
+
+    </div>
+    <div class="col-sm-3">
+      <div class="sidebar-module">
+        <h4>What is Malt?</h4>
+        <ol class="list-unstyled">
+          <li><a href="/cms">CMS included</a>
+          </li>
+          <li><a href="/searchengine">Search Engine</a>
+          </li>
+          <li><a href="/deploy">Deploy in a minute</a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
 </div>
 {{end}}
