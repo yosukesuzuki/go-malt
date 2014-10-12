@@ -1,0 +1,44 @@
+{{ define "content"}}
+<div class="container">
+  <div class="page-header">
+    <div class="row">
+      <form class="form-inline" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="keyword">Keyword</label>
+          <input type="text" name="keyword" class="form-control" value="{{ .keyword }}" id="keyword"
+          placeholder="Enter Keyword">
+        </div>
+        <button type="submit" class="btn btn-default">Search</button>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <h5>{{ .title }}</h5>
+    <div class="col-sm-8 page-main">
+      <ul class="media-list" id="searchList">
+        <li class="media" v-repeat="items">
+          <div class="media-body">
+          <h4 class="media-heading"><a href="{{`{{url}}`}}">{{`{{title}}`}}</a></h4>
+            {{`{{content}}`}}
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-3">
+      <div class="sidebar-module">
+        <h4>What is Malt?</h4>
+        <ol class="list-unstyled">
+          <li><a href="/cms">CMS included</a>
+          </li>
+          <li><a href="/searchengine">Search Engine</a>
+          </li>
+          <li><a href="/deploy">Deploy in a minute</a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/media/js/vue.min.js"></script>
+<script src="/media/js/search.js"></script>
+{{end}}

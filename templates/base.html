@@ -14,6 +14,7 @@
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="/media/css/flatly.min.css">
   <link rel="stylesheet" href="/media/css/malt.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <style>
   </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -41,8 +42,8 @@
           <li><a href="https://github.com/yosukesuzuki/go-malt">Github</a>
           </li>
         </ul>
-        <form class="navbar-form navbar-right">
-          <input type="text" class="form-control" placeholder="Search...">
+        <form class="navbar-form navbar-right" method="GET" action="/search">
+          <input type="text" class="form-control" placeholder="Search..." name="keyword">
         </form>
       </div>
     </div>
@@ -69,7 +70,6 @@
   </footer>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <!-- Latest compiled and minified JavaScript -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <div id="fb-root"></div>

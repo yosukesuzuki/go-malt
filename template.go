@@ -187,6 +187,7 @@ var tpls = map[string]*template.Template{
 	"form":         newTemplate("templates/admin_base.html", "templates/form.html"),
 	"page":         newTemplate("templates/base.html", "templates/page.html"),
 	"articleIndex": newTemplate("templates/base.html", "templates/article_index.html"),
+	"searchIndex":  newTemplate("templates/base.html", "templates/search_index.html"),
 }
 
 var funcs = template.FuncMap{
