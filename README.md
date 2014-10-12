@@ -14,7 +14,10 @@ What is this?
     - go runtime spin up is faster than python and java
 - Responsive template
 
-#set up
+# version
+0.1
+
+# set up
 ##1. install go
 if you use Mac OS, "brew install go" is the easiest way.
 

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"net/http"
-
 	"appengine"
 	"appengine/datastore"
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
+	"html/template"
+	"net/http"
 )
 
 func index(w http.ResponseWriter, r *http.Request) error {
@@ -50,7 +50,7 @@ func articlePage(w http.ResponseWriter, r *http.Request) error {
 }
 
 func searchPage(w http.ResponseWriter, r *http.Request) error {
-	keyword := r.FormValue("keyword")
+	keyword := template.HTMLEscapeString(r.FormValue("keyword"))
 	data := map[string]interface{}{
 		"title":       "Search Results of " + keyword,
 		"description": "Search Results of " + keyword,
