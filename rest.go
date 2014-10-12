@@ -16,7 +16,7 @@ func getSearchResult(w http.ResponseWriter, r *http.Request) map[string]interfac
 		http.Error(w, openErr.Error(), http.StatusInternalServerError)
 	}
 	keyword := r.FormValue("keyword")
-	for t := index.Search(c, keyword, nil); ; {
+	for t := index.Search(c, "\""+keyword+"\"", nil); ; {
 		var as ArticleSearch
 		_, err := t.Next(&as)
 		if err == search.Done {
@@ -25,6 +25,19 @@ func getSearchResult(w http.ResponseWriter, r *http.Request) map[string]interfac
 		if err != nil {
 			c.Errorf("fetching next ArticleSearch: %v", err)
 			break
+		}
+		slicedTextByte := []byte(as.Content)
+		var slicedText string
+		if len(slicedTextByte) > 100 {
+			slicedText = string(slicedTextByte[:100])
+		} else {
+			slicedText = string(slicedTextByte)
+		}
+		as.Content = slicedText
+		if as.ModelName == "adminpage" {
+			as.URL = "/" + as.URL
+		} else if as.ModelName == "article" {
+			as.URL = "/article/" + as.URL
 		}
 		items = append(items, as)
 	}
