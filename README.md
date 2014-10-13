@@ -14,6 +14,8 @@ What is this?
     - go runtime spin up is faster than python and java
 - Responsive template
 
+check the demo site -> http://go-malt.appspot.com/
+
 # version
 0.1
 
