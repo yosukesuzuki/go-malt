@@ -30,7 +30,7 @@ script:
 after_success:
 - python $GAE/appcfg.py update . --oauth2_refresh_token=$GAE_OAUTH -A dev-goappstarter
 after_script:
-- casperjs test tests --env=gaedev --user_id=$GAE_TEST_USER --user_password=$GAE_TEST_USER_PASSWORD
+- casperjs --pre=caspertests/helpers/adminlogin.coffee test caspertests/tests --env=gaedev --user_id=$GAE_TEST_USER --user_password=$GAE_TEST_USER_PASSWORD
 env:
   global:
   - secure: KiEdocf9yqxGaBaMO+5YwfrHWKEMIkqSZx40uOenLCJWvQbm+KRlvTjqyGR/SxJDqjYwS82LAdMILqhzVSjdhPgyJSSzMXXL/YkKccedkZJabHu6FXXwlkSRyxIyr1JRqeSzzSQHtYb8VqtKQ8GwqBeWcS9mZtT5Fhxx+WcH6QQ=
